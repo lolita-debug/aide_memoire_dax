@@ -1,5 +1,5 @@
 # Aide-mémoire DAX (Power BI, format PBIP)
-
+📊 **Présentation en 10 diapositives** : [Comprendre le rapport et le faire tourner](Aide_memoire_DAX_comprendre_le_rapport.pptx)
 Un rapport Power BI pour apprendre et réviser le langage DAX. Il contient :
 - **Guide des fonctions** : la liste des fonctions DAX, avec une fiche détaillée pour chacune et une page d'export.
 - **Top 25** : une sélection indicative des fonctions à connaître en priorité.
