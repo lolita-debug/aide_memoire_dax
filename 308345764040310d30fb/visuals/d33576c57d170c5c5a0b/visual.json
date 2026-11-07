@@ -1,0 +1,94 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "d33576c57d170c5c5a0b",
+  "position": {
+    "x": 290,
+    "y": 836,
+    "z": 2800,
+    "height": 210,
+    "width": 1590,
+    "tabOrder": 2800
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Ecarts_Excel_non_scrapés"
+                    }
+                  },
+                  "Property": "Fonction"
+                }
+              },
+              "queryRef": "_Ecarts_Excel_non_scrapés.Fonction",
+              "nativeQueryRef": "Fonction"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Ecarts_Excel_non_scrapés"
+                    }
+                  },
+                  "Property": "Description"
+                }
+              },
+              "queryRef": "_Ecarts_Excel_non_scrapés.Description",
+              "nativeQueryRef": "Description"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Ecarts_Excel_non_scrapés"
+                    }
+                  },
+                  "Property": "Nature"
+                }
+              },
+              "queryRef": "_Ecarts_Excel_non_scrapés.Nature",
+              "nativeQueryRef": "Nature"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "d6935aebbf7b9a270ff7",
+  "position": {
+    "x": 290,
+    "y": 540,
+    "z": 2600,
+    "height": 204,
+    "width": 1590,
+    "tabOrder": 2600
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Ecarts_DaxFunctions_vs_Excel"
+                    }
+                  },
+                  "Property": "Fonction"
+                }
+              },
+              "queryRef": "_Ecarts_DaxFunctions_vs_Excel.Fonction",
+              "nativeQueryRef": "Fonction"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Ecarts_DaxFunctions_vs_Excel"
+                    }
+                  },
+                  "Property": "Description"
+                }
+              },
+              "queryRef": "_Ecarts_DaxFunctions_vs_Excel.Description",
+              "nativeQueryRef": "Description"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Ecarts_DaxFunctions_vs_Excel"
+                    }
+                  },
+                  "Property": "Nature"
+                }
+              },
+              "queryRef": "_Ecarts_DaxFunctions_vs_Excel.Nature",
+              "nativeQueryRef": "Nature"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "1012.90026576518D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Ecarts_DaxFunctions_vs_Excel.Description"
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {}
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

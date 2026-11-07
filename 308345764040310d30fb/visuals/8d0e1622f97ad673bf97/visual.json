@@ -1,0 +1,145 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "8d0e1622f97ad673bf97",
+  "position": {
+    "x": 1106,
+    "y": 200,
+    "z": 2400,
+    "height": 240,
+    "width": 774,
+    "tabOrder": 2400
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_TableMesures"
+                    }
+                  },
+                  "Property": "_Manquants_dans_Excel"
+                }
+              },
+              "queryRef": "_TableMesures._Manquants_dans_Excel",
+              "nativeQueryRef": "_Manquants_dans_Excel",
+              "displayName": "Fonctions absentes de l'Excel"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_TableMesures"
+                    }
+                  },
+                  "Property": "_Manquants_dans_Scraping"
+                }
+              },
+              "queryRef": "_TableMesures._Manquants_dans_Scraping",
+              "nativeQueryRef": "_Manquants_dans_Scraping",
+              "displayName": "Fonctions absentes de Microsoft Learn"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_TableMesures"
+                    }
+                  },
+                  "Property": "_Taux_Couverture"
+                }
+              },
+              "queryRef": "_TableMesures._Taux_Couverture",
+              "nativeQueryRef": "_Taux_Couverture",
+              "displayName": "Taux de couverture"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_TableMesures"
+                    }
+                  },
+                  "Property": "_Fiches_desynchronisees"
+                }
+              },
+              "queryRef": "_TableMesures._Fiches_desynchronisees",
+              "nativeQueryRef": "_Fiches_desynchronisees",
+              "displayName": "Mesures introuvables dans les fiches (doit valoir 0)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_TableMesures"
+                    }
+                  },
+                  "Property": "_Part_Extraction_Titres"
+                }
+              },
+              "queryRef": "_TableMesures._Part_Extraction_Titres",
+              "nativeQueryRef": "_Part_Extraction_Titres",
+              "displayName": "Détails lus par titres de section"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_TableMesures"
+                  }
+                },
+                "Property": "_Manquants_dans_Excel"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

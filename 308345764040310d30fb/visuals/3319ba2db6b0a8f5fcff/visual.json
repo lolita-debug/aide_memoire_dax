@@ -1,0 +1,231 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "3319ba2db6b0a8f5fcff",
+  "position": {
+    "x": 290,
+    "y": 180,
+    "z": 2200,
+    "height": 270,
+    "width": 764,
+    "tabOrder": 2200
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "• Microsoft Learn (fr-fr) : ",
+                    "textStyle": {
+                      "fontFamily": "Calibri",
+                      "fontSize": "11pt",
+                      "color": "#FFFFFF",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "catégories et fiches de chaque fonction, récupérées par Power Query (GetDaxFunctions, GetDaxFunctionDetails).",
+                    "textStyle": {
+                      "fontFamily": "Calibri",
+                      "fontSize": "11pt",
+                      "color": "#D4D4D4"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "• Classeur COMMANDES_DAX : ",
+                    "textStyle": {
+                      "fontFamily": "Calibri",
+                      "fontSize": "11pt",
+                      "color": "#FFFFFF",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "fiches maison (exemples, usages, remarques). FACULTATIF : chemin dans le paramètre ParamCheminExcel ; sans classeur, ces rubriques restent vides.",
+                    "textStyle": {
+                      "fontFamily": "Calibri",
+                      "fontSize": "11pt",
+                      "color": "#D4D4D4"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "• Paramètre ParamScraperDetails : ",
+                    "textStyle": {
+                      "fontFamily": "Calibri",
+                      "fontSize": "11pt",
+                      "color": "#FFFFFF",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "true = lit la page de chaque fonction (lent) ; false = actualisation rapide, sans les détails.",
+                    "textStyle": {
+                      "fontFamily": "Calibri",
+                      "fontSize": "11pt",
+                      "color": "#D4D4D4"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "• Top 25 : ",
+                    "textStyle": {
+                      "fontFamily": "Calibri",
+                      "fontSize": "11pt",
+                      "color": "#FFFFFF",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "sélection indicative établie d'après SQLBI, la documentation Microsoft et la communauté Power BI (pas une fréquence mesurée).",
+                    "textStyle": {
+                      "fontFamily": "Calibri",
+                      "fontSize": "11pt",
+                      "color": "#D4D4D4"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "• Données d'exemple : ",
+                    "textStyle": {
+                      "fontFamily": "Calibri",
+                      "fontSize": "11pt",
+                      "color": "#FFFFFF",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "fictives, générées dans Power Query à graine fixe (identiques à chaque actualisation).",
+                    "textStyle": {
+                      "fontFamily": "Calibri",
+                      "fontSize": "11pt",
+                      "color": "#D4D4D4"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "",
+                    "textStyle": {
+                      "fontFamily": "Calibri",
+                      "fontSize": "12pt",
+                      "color": "#D4D4D4"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Référence des fonctions DAX sur Microsoft Learn ↗",
+                    "textStyle": {
+                      "fontFamily": "Calibri",
+                      "fontSize": "11pt",
+                      "color": "#FFFFFF",
+                      "fontWeight": "bold"
+                    },
+                    "url": "https://learn.microsoft.com/fr-fr/dax/dax-function-reference"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

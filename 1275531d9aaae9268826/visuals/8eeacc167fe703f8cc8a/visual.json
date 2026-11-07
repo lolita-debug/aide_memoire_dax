@@ -1,0 +1,462 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "8eeacc167fe703f8cc8a",
+  "position": {
+    "x": 290,
+    "y": 430,
+    "z": 2700,
+    "height": 616,
+    "width": 1590,
+    "tabOrder": 2700
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DaxFunctions"
+                    }
+                  },
+                  "Property": "NomFonctionDAX"
+                }
+              },
+              "queryRef": "DaxFunctions.NomFonctionDAX",
+              "nativeQueryRef": "NomFonctionDAX",
+              "displayName": "Fonction"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DaxFunctions"
+                    }
+                  },
+                  "Property": "ToutesCategories"
+                }
+              },
+              "queryRef": "DaxFunctions.ToutesCategories",
+              "nativeQueryRef": "ToutesCategories",
+              "displayName": "Catégories"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DaxFunctions"
+                    }
+                  },
+                  "Property": "DescriptionFonction"
+                }
+              },
+              "queryRef": "DaxFunctions.DescriptionFonction",
+              "nativeQueryRef": "DescriptionFonction",
+              "displayName": "Description"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DaxFunctions"
+                    }
+                  },
+                  "Property": "SyntaxeFonction"
+                }
+              },
+              "queryRef": "DaxFunctions.SyntaxeFonction",
+              "nativeQueryRef": "SyntaxeFonction",
+              "displayName": "Syntaxe"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DaxFunctions"
+                    }
+                  },
+                  "Property": "ValeurRetour"
+                }
+              },
+              "queryRef": "DaxFunctions.ValeurRetour",
+              "nativeQueryRef": "ValeurRetour",
+              "displayName": "Valeur de retour"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DaxFunctions"
+                    }
+                  },
+                  "Property": "Remarques"
+                }
+              },
+              "queryRef": "DaxFunctions.Remarques",
+              "nativeQueryRef": "Remarques",
+              "displayName": "Remarques"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DaxFunctions"
+                    }
+                  },
+                  "Property": "Exemples"
+                }
+              },
+              "queryRef": "DaxFunctions.Exemples",
+              "nativeQueryRef": "Exemples",
+              "displayName": "Exemples"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_TableMesures"
+                    }
+                  },
+                  "Property": "Remarques maison"
+                }
+              },
+              "queryRef": "_TableMesures.Remarques maison",
+              "nativeQueryRef": "Remarques maison",
+              "displayName": "Remarques (fiche maison)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_TableMesures"
+                    }
+                  },
+                  "Property": "Utilisation maison"
+                }
+              },
+              "queryRef": "_TableMesures.Utilisation maison",
+              "nativeQueryRef": "Utilisation maison",
+              "displayName": "Utilisation (fiche maison)"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DaxFunctions"
+                    }
+                  },
+                  "Property": "URLReference"
+                }
+              },
+              "queryRef": "DaxFunctions.URLReference",
+              "nativeQueryRef": "URLReference",
+              "displayName": "Documentation"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DaxFunctions"
+                  }
+                },
+                "Property": "NomFonctionDAX"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Calibri'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Calibri'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "grid": [
+        {
+          "properties": {
+            "outlineStyle": {
+              "expr": {
+                "Literal": {
+                  "Value": "15D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "170D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "DaxFunctions.NomFonctionDAX"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "150D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "DaxFunctions.ToutesCategories"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "300D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "DaxFunctions.DescriptionFonction"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "260D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "DaxFunctions.SyntaxeFonction"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "220D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "DaxFunctions.ValeurRetour"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "360D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "DaxFunctions.Remarques"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "300D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "DaxFunctions.Exemples"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "260D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_TableMesures.Remarques maison"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "220D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_TableMesures.Utilisation maison"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "220D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "DaxFunctions.URLReference"
+          }
+        }
+      ],
+      "total": [
+        {
+          "properties": {
+            "totals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "stylePreset": [
+        {
+          "properties": {
+            "name": {
+              "expr": {
+                "Literal": {
+                  "Value": "'BoldHeader'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Tableau complet des fonctions DAX filtrées, à exporter'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
