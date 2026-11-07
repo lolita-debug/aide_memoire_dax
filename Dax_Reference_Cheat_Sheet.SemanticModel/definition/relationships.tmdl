@@ -1,0 +1,25 @@
+relationship 63c0b9ed-9497-4c12-8165-fbd449859c55
+	fromColumn: DaxFunctions.DaxFunctionTypes
+	toColumn: DaxFunctionTypes.DaxFunctionTypes
+
+relationship cdf52f3c-87c0-7025-21c3-a91bd72157a1
+	fromColumn: DATA_DAX.'Fonction DAX'
+	toColumn: DaxFunctions.NomFonctionDAX
+
+relationship 2976f2f0-4abd-65aa-7481-d1ca84acf826
+	fromColumn: DaxFunctions.NomFonctionDAX
+	toColumn: TopFonctionsDAX.NomFonctionDAX
+
+relationship 9b0be1b8-5ee4-b927-7693-51ac87971044
+	fromColumn: Commandes.ProduitKey
+	toColumn: Produits.ProduitKey
+
+relationship 5f1cbcf7-27f6-1897-be0a-9d07b1d01686
+	fromColumn: Commandes.DateCommande
+	toColumn: Calendrier.Date
+
+relationship f9ab6c3c-43c4-9f97-0982-dbf537d0fc86
+	isActive: false
+	fromColumn: Commandes.DateExpedition
+	toColumn: Calendrier.Date
+

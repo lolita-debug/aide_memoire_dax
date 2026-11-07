@@ -1,0 +1,112 @@
+/// Données fictives : lignes de vente 2022-2025
+table Commandes
+	lineageTag: 9a4496a5-f3e8-20f0-fbc0-c56d9e6fc10c
+
+	column NumLigne
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d2fb9629-6381-dd44-8bf5-e89ffa31b146
+		summarizeBy: none
+		sourceColumn: NumLigne
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateCommande
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 891c81e6-80d6-a206-3005-996b8050dc66
+		summarizeBy: none
+		sourceColumn: DateCommande
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column DateExpedition
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: be26763a-65d2-f1ec-498f-5e80e24974ee
+		summarizeBy: none
+		sourceColumn: DateExpedition
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ProduitKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e67e6548-a797-e264-ad78-cdbca5f4f742
+		summarizeBy: none
+		sourceColumn: ProduitKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantite
+		dataType: int64
+		formatString: 0
+		lineageTag: 5c270315-c51e-9387-4811-56b449d7622b
+		summarizeBy: sum
+		sourceColumn: Quantite
+
+		annotation SummarizationSetBy = Automatic
+
+	column Montant
+		dataType: double
+		formatString: #,0\ €;-#,0\ €;#,0\ €
+		lineageTag: e2d5ed75-e39d-e72a-ecc5-4460827c322e
+		summarizeBy: sum
+		sourceColumn: Montant
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Commandes = m
+		mode: import
+		queryGroup: Exemples
+		source =
+				// ============================================================
+				// TABLE : Commandes (DONNÉES FICTIVES — fiches exemples)
+				// 12 000 lignes de vente générées par tirages pseudo-aléatoires
+				// à graine fixe : les chiffres sont identiques à chaque actualisation.
+				// Une ligne = un produit commandé (date de commande, d'expédition, montant)
+				// ============================================================
+				let
+				    NbLignes  = 12000,
+				    DateDebut = #date(2022, 1, 1),
+				    NbJours   = Duration.Days(#date(2025, 12, 31) - DateDebut) + 1,
+				
+				    // -- Tirages reproductibles (List.Random avec graine)
+				    AleaDate      = List.Buffer(List.Random(NbLignes, 11)),
+				    AleaProduit   = List.Buffer(List.Random(NbLignes, 22)),
+				    AleaQuantite  = List.Buffer(List.Random(NbLignes, 33)),
+				    AleaPrix      = List.Buffer(List.Random(NbLignes, 44)),
+				    AleaLivraison = List.Buffer(List.Random(NbLignes, 55)),
+				
+				    // -- Urne pondérée : chaque produit y figure "Poids" fois
+				    Urne = List.Buffer(List.Combine(List.Transform(Table.ToRecords(Produits), each List.Repeat({[ProduitKey]}, [Poids])))),
+				    Prix = List.Buffer(Table.Sort(Produits, {{"ProduitKey", Order.Ascending}})[PrixUnitaire]),
+				
+				    Lignes = List.Transform({0 .. NbLignes - 1}, (i) =>
+				        let
+				            DateCde    = Date.AddDays(DateDebut, Number.RoundDown(AleaDate{i} * NbJours)),
+				            Cle        = Urne{Number.RoundDown(AleaProduit{i} * List.Count(Urne))},
+				            Quantite   = 1 + Number.RoundDown(AleaQuantite{i} * 3),
+				            Croissance = 1 + 0.08 * (Date.Year(DateCde) - 2022),
+				            Montant    = Number.Round(Quantite * Prix{Cle - 1} * (0.85 + 0.3 * AleaPrix{i}) * Croissance, 2),
+				            DateExp    = Date.AddDays(DateCde, 1 + Number.RoundDown(AleaLivraison{i} * 6))
+				        in
+				            {i + 1, DateCde, DateExp, Cle, Quantite, Montant}
+				    ),
+				    Source = #table(
+				        type table [NumLigne = Int64.Type, DateCommande = date, DateExpedition = date, ProduitKey = Int64.Type, Quantite = Int64.Type, Montant = number],
+				        Lignes
+				    )
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

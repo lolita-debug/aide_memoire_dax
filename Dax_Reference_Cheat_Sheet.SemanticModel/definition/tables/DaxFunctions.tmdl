@@ -1,0 +1,230 @@
+table DaxFunctions
+	lineageTag: d0287364-4516-4c4e-ada8-48eadc2c67b3
+
+	column DaxFunctionTypes
+		dataType: string
+		lineageTag: 748ab95c-a65f-4423-b8a9-e7488e3b477c
+		summarizeBy: none
+		sourceColumn: DaxFunctionTypes
+
+		annotation SummarizationSetBy = Automatic
+
+	column DaxFunctionTypesLink
+		dataType: string
+		isHidden
+		lineageTag: d0a13c9c-9c94-4a56-bca5-efcafa157025
+		summarizeBy: none
+		sourceColumn: DaxFunctionTypesLink
+
+		annotation SummarizationSetBy = Automatic
+
+	column DaxFunctionWebPath
+		dataType: string
+		isHidden
+		lineageTag: 319f989e-ec1a-44a2-a767-1147ba238c7e
+		summarizeBy: none
+		sourceColumn: DaxFunctionWebPath
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Nom de la fonction DAX (majuscules, clé)
+	column NomFonctionDAX
+		dataType: string
+		lineageTag: 324723f2-2484-4bef-af9f-df17c8f2acb3
+		summarizeBy: none
+		sourceColumn: NomFonctionDAX
+
+		annotation SummarizationSetBy = Automatic
+
+	column LienFonctionDAX
+		dataType: string
+		isHidden
+		lineageTag: 7fa52d71-d773-4741-90fe-3f47e767182d
+		summarizeBy: none
+		sourceColumn: LienFonctionDAX
+
+		annotation SummarizationSetBy = Automatic
+
+	column DescriptionCourte
+		dataType: string
+		lineageTag: 16f0ce4d-5eec-42c7-8aa0-d11183d3cce4
+		summarizeBy: none
+		sourceColumn: DescriptionCourte
+
+		annotation SummarizationSetBy = Automatic
+
+	column URLReference
+		dataType: string
+		lineageTag: 1a5498a2-89da-4399-b52a-7b2ff96ecc55
+		dataCategory: WebUrl
+		summarizeBy: none
+		sourceColumn: URLReference
+
+		annotation SummarizationSetBy = Automatic
+
+	column DescriptionFonction
+		dataType: string
+		lineageTag: a1ee8188-cc7b-4757-a781-60e6b7162c1d
+		summarizeBy: none
+		sourceColumn: DescriptionFonction
+
+		annotation SummarizationSetBy = Automatic
+
+	column SyntaxeFonction
+		dataType: string
+		lineageTag: 8d196ffd-230a-4f3e-b7fb-f2a89ce18872
+		summarizeBy: none
+		sourceColumn: SyntaxeFonction
+
+		annotation SummarizationSetBy = Automatic
+
+	column ValeurRetour
+		dataType: string
+		lineageTag: 23282e30-64e1-4483-bb9f-a41c6497ce0f
+		summarizeBy: none
+		sourceColumn: ValeurRetour
+
+		annotation SummarizationSetBy = Automatic
+
+	column Remarques
+		dataType: string
+		lineageTag: 597cd8f3-cc49-400d-a91a-b4e2ffeae565
+		summarizeBy: none
+		sourceColumn: Remarques
+
+		annotation SummarizationSetBy = Automatic
+
+	column Exemples
+		dataType: string
+		lineageTag: fcf16894-727b-4591-bb1d-b402b42f229b
+		summarizeBy: none
+		sourceColumn: Exemples
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Toutes les catégories Microsoft de la fonction (une fonction peut appartenir à plusieurs).
+	/// DaxFunctionTypes ne garde que la 1re : le segment Catégorie ne la montre que là.
+	column ToutesCategories
+		dataType: string
+		lineageTag: 3e42e9a6-cfda-553f-975e-f0ed8119dd30
+		summarizeBy: none
+		sourceColumn: ToutesCategories
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Contrôle qualité du scraping : « Titres de section », « Mixte » ou « Position (secours) »
+	column MethodeExtraction
+		dataType: string
+		lineageTag: fca68309-932e-539b-9cb5-9eefe7b1b962
+		summarizeBy: none
+		sourceColumn: MethodeExtraction
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DaxFunctions-2806c0de-ed74-4b32-89f2-bdd8752d5706 = m
+		mode: import
+		queryGroup: Tables
+		source =
+				// ============================================================
+				// TABLE FINALE : DaxFunctions
+				// RÔLE : Orchestre le scraping — boucle sur les 15 catégories,
+				//        récupère toutes les fonctions DAX et leurs détails
+				//        depuis learn.microsoft.com/fr-fr
+				// ============================================================
+				let
+				    // -- Étape 1 : Partir de la liste des catégories (hardcodée, stable)
+				    #"Source catégories" = Table.SelectColumns(DaxFunctionTypes, {"DaxFunctionTypes", "DaxFunctionTypesLink"}),
+				
+				    // -- Étape 2 : Ajouter le chemin web de base sur chaque ligne
+				    #"Ajout chemin web" = Table.AddColumn(#"Source catégories", "DaxFunctionWebPath", each ParamWebPath, type text),
+				
+				    // -- Étape 3 : Pour chaque catégorie, appeler GetDaxFunctions (nom + lien + description courte)
+				    #"Appel GetDaxFunctions" = Table.AddColumn(
+				        #"Ajout chemin web",
+				        "ListeFonctions",
+				        each GetDaxFunctions([DaxFunctionWebPath], [DaxFunctionTypesLink])
+				    ),
+				
+				    // -- Étape 4 : Déplier la table des fonctions pour chaque catégorie
+				    #"Dépliage fonctions" = Table.ExpandTableColumn(
+				        #"Appel GetDaxFunctions",
+				        "ListeFonctions",
+				        {"NomFonctionDAX", "LienFonctionDAX", "DescriptionCourte"}
+				    ),
+				
+				    // -- Étape 5 : Supprimer les lignes sans nom de fonction (sécurité)
+				    #"Suppression lignes vides" = Table.SelectRows(
+				        #"Dépliage fonctions",
+				        each [NomFonctionDAX] <> null and [NomFonctionDAX] <> ""
+				    ),
+				
+				    // -- Étape 6a : Mettre en mémoire la liste scrapée (sinon les pages catégories
+				    //             seraient téléchargées deux fois : étapes 6b et 6c)
+				    #"Fonctions en mémoire" = Table.Buffer(#"Suppression lignes vides"),
+				
+				    // -- Étape 6b : Mémoriser toutes les catégories de chaque fonction avant dédoublonnage
+				    #"Catégories par fonction" = Record.FromTable(
+				        Table.RenameColumns(
+				            Table.Group(#"Fonctions en mémoire", {"NomFonctionDAX"},
+				                {{"Categories", each Text.Combine(List.Distinct([DaxFunctionTypes]), " · "), type text}}),
+				            {{"NomFonctionDAX", "Name"}, {"Categories", "Value"}}
+				        )
+				    ),
+				
+				    // -- Étape 6c : 1 ligne par fonction (NomFonctionDAX = côté 1 de la relation avec DATA_DAX)
+				    //             Si une fonction apparaît dans 2 catégories, on garde la 1re (ordre des catégories)
+				    #"Dédoublonnage fonctions" = Table.Distinct(#"Fonctions en mémoire", {"NomFonctionDAX"}),
+				    #"Ajout toutes catégories" = Table.AddColumn(
+				        #"Dédoublonnage fonctions",
+				        "ToutesCategories",
+				        each Record.FieldOrDefault(#"Catégories par fonction", [NomFonctionDAX], null),
+				        type text
+				    ),
+				
+				    // -- Étape 7 : URL complète de référence de chaque fonction
+				    #"Ajout URL référence" = Table.AddColumn(
+				        #"Ajout toutes catégories",
+				        "URLReference",
+				        each [DaxFunctionWebPath] & [LienFonctionDAX],
+				        type text
+				    ),
+				
+				    // -- Étape 8 : Pour chaque fonction, appeler GetDaxFunctionDetails
+				    //             try ... otherwise null : pages inaccessibles (404, etc.)
+				    //             ParamScraperDetails = false : pas d'appel (actualisation rapide)
+				    #"Appel GetDaxFunctionDetails" = Table.AddColumn(
+				        #"Ajout URL référence",
+				        "Details",
+				        each if ParamScraperDetails then (try GetDaxFunctionDetails([DaxFunctionWebPath], [LienFonctionDAX]) otherwise null) else null
+				    ),
+				
+				    // -- Étape 9 : Déplier les détails de chaque fonction
+				    #"Dépliage détails" = Table.ExpandTableColumn(
+				        #"Appel GetDaxFunctionDetails",
+				        "Details",
+				        {"DescriptionFonction", "SyntaxeFonction", "ValeurRetour", "Remarques", "Exemples", "MethodeExtraction"}
+				    ),
+				
+				    // -- Étape 10 : Typage final
+				    #"Typage colonnes final" = Table.TransformColumnTypes(
+				        #"Dépliage détails",
+				        {
+				            {"NomFonctionDAX",      type text},
+				            {"LienFonctionDAX",     type text},
+				            {"DescriptionCourte",   type text},
+				            {"DescriptionFonction", type text},
+				            {"SyntaxeFonction",     type text},
+				            {"ValeurRetour",        type text},
+				            {"Remarques",           type text},
+				            {"Exemples",            type text},
+				            {"ToutesCategories",    type text},
+				            {"MethodeExtraction",   type text}
+				        }
+				    )
+				in
+				    #"Typage colonnes final"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

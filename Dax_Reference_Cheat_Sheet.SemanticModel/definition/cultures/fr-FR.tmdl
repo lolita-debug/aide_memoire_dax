@@ -1,0 +1,699 @@
+cultureInfo fr-FR
+
+	linguisticMetadata =
+			{
+			  "Version": "2.0.0",
+			  "Language": "en-US",
+			  "Entities": {
+			    "daxfunctions.remarques": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DaxFunctions",
+			          "ConceptualProperty": "Remarques"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Remarques": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "data_dax.remarque": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DATA_DAX",
+			          "ConceptualProperty": "Remarque"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "daxfunctions.descriptionfonction": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DaxFunctions",
+			          "ConceptualProperty": "DescriptionFonction"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Mot dans la description": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        },
+			        {
+			          "Description": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "daxfunctions.nomfonctiondax": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DaxFunctions",
+			          "ConceptualProperty": "NomFonctionDAX"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Nom de la fonction": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        },
+			        {
+			          "Fonction": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "daxfunctions.syntaxefonction": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DaxFunctions",
+			          "ConceptualProperty": "SyntaxeFonction"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Syntaxe": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "daxfunctions.urlreference": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DaxFunctions",
+			          "ConceptualProperty": "URLReference"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Documentation": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "calendrier.annee": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Calendrier",
+			          "ConceptualProperty": "Annee"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Année": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "calendrier.anneemois": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Calendrier",
+			          "ConceptualProperty": "AnneeMois"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Mois": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_tablemesures.column_manquants_dans_excel": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_TableMesures",
+			          "ConceptualProperty": "_Manquants_dans_Excel"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Fonctions absentes de l'Excel": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_tablemesures.column_manquants_dans_scraping": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_TableMesures",
+			          "ConceptualProperty": "_Manquants_dans_Scraping"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Fonctions absentes de Microsoft Learn": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_tablemesures.column_taux_couverture": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_TableMesures",
+			          "ConceptualProperty": "_Taux_Couverture"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Taux de couverture": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_tablemesures.remarques_maison": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_TableMesures",
+			          "ConceptualProperty": "Remarques maison"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Remarques (fiche maison)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_tablemesures.utilisation_maison": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_TableMesures",
+			          "ConceptualProperty": "Utilisation maison"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Utilisation (fiche maison)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_tablemesures.column_fiches_desynchronisees": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_TableMesures",
+			          "ConceptualProperty": "_Fiches_desynchronisees"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Mesures introuvables dans les fiches (doit valoir 0)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_tablemesures.column_part_extraction_titres": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_TableMesures",
+			          "ConceptualProperty": "_Part_Extraction_Titres"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Détails lus par titres de section": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "daxfunctions.descriptioncourte": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DaxFunctions",
+			          "ConceptualProperty": "DescriptionCourte"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Description": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "daxfunctions.toutescategories": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DaxFunctions",
+			          "ConceptualProperty": "ToutesCategories"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Catégories": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "daxfunctions.valeurretour": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DaxFunctions",
+			          "ConceptualProperty": "ValeurRetour"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Valeur de retour": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "daxfunctions.exemples": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DaxFunctions",
+			          "ConceptualProperty": "Exemples"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Exemples": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_tablemesures.ventes_au_prix_catalogue": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_TableMesures",
+			          "ConceptualProperty": "Ventes au prix catalogue"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Quantité × prix": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        },
+			        {
+			          "Prix catalogue": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        },
+			        {
+			          "Au prix catalogue": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_tablemesures.ventes": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_TableMesures",
+			          "ConceptualProperty": "Ventes"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Montant facturé": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        },
+			        {
+			          "Montant": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        },
+			        {
+			          "Ventes 2022-2025": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_tablemesures.column_change_de_mois": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_TableMesures",
+			          "ConceptualProperty": "_Change_De_Mois"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Change de mois ?": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "produits.produit": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Produits",
+			          "ConceptualProperty": "Produit"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Produit": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "produits.marque": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Produits",
+			          "ConceptualProperty": "Marque"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Marque": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "produits.categorie": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Produits",
+			          "ConceptualProperty": "Categorie"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Catégorie": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "produits.prixunitaire": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Produits",
+			          "ConceptualProperty": "PrixUnitaire"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Prix catalogue": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "commandes.numligne": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Commandes",
+			          "ConceptualProperty": "NumLigne"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "N° ligne": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "commandes.datecommande": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Commandes",
+			          "ConceptualProperty": "DateCommande"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Date": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        },
+			        {
+			          "Commandée le": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "commandes.quantite": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Commandes",
+			          "ConceptualProperty": "Quantite"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Quantité": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "commandes.dateexpedition": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Commandes",
+			          "ConceptualProperty": "DateExpedition"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Expédiée le": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    }
+			  }
+			}
+		contentType: json
+

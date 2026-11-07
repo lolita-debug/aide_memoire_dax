@@ -1,0 +1,411 @@
+table _TableMesures
+	lineageTag: 1e833c51-4e1c-48c1-a2e6-de66dff25ad8
+
+	/// Fonctions scrapées Microsoft mais absentes de l'Excel (= lignes de _Ecarts_DaxFunctions_vs_Excel)
+	measure _Manquants_dans_Excel = COUNTROWS ( _Ecarts_DaxFunctions_vs_Excel ) + 0
+		formatString: 0
+		displayFolder: Contrôles
+		lineageTag: dc2aec60-062d-4003-a40b-b8227e005cfe
+
+	/// Lignes de l'Excel absentes du scraping Microsoft (= lignes de _Ecarts_Excel_non_scrapés)
+	measure _Manquants_dans_Scraping = COUNTROWS ( '_Ecarts_Excel_non_scrapés' ) + 0
+		formatString: 0
+		displayFolder: Contrôles
+		lineageTag: 36c8ef4b-1614-4c7a-aa3e-fb4f9db26792
+
+	/// % des fonctions scrapées qui ont une correspondance dans l'Excel
+	measure _Taux_Couverture =
+			DIVIDE (
+			    CALCULATE (
+			        COUNTROWS ( DaxFunctions ),
+			        DaxFunctions[NomFonctionDAX] IN VALUES ( DATA_DAX[Fonction DAX] )
+			    ),
+			    COUNTROWS ( DaxFunctions ),
+			    0
+			)
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		displayFolder: Contrôles
+		lineageTag: 9db87f6c-86c3-4ad5-a20c-31b324e28a39
+
+	/// Mesures citées dans Exemples[Mesures] mais introuvables dans le modèle (faute de frappe). Doit valoir 0.
+	measure _Fiches_desynchronisees = COUNTROWS ( FILTER ( _Fiches_Code, CONTAINSSTRING ( _Fiches_Code[CodeDAX], "mesure introuvable" ) ) ) + 0
+		formatString: 0
+		displayFolder: Contrôles
+		lineageTag: e8a03396-bd27-5ce0-8e3c-c90d6ae41d7a
+
+	/// % des fonctions dont les détails ont été lus par les titres de section (sinon : méthode de secours par position)
+	measure _Part_Extraction_Titres =
+			DIVIDE (
+			    CALCULATE ( COUNTROWS ( DaxFunctions ), DaxFunctions[MethodeExtraction] = "Titres de section" ),
+			    COUNTROWS ( DaxFunctions )
+			)
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		displayFolder: Contrôles
+		lineageTag: e3fa241c-8eaa-5cd4-92c5-a064d4cb16fe
+
+	/// Remarques du classeur COMMANDES_DAX pour UNE fonction (« — » si aucune, vide sur une ligne Total)
+	measure 'Remarques maison' =
+			IF (
+			    HASONEVALUE ( DaxFunctions[NomFonctionDAX] ),
+			    VAR _txt =
+			        CONCATENATEX (
+			            FILTER ( VALUES ( DATA_DAX[Remarque] ), LEN ( DATA_DAX[Remarque] ) > 0 ),
+			            DATA_DAX[Remarque],
+			            " | "
+			        )
+			    RETURN
+			        IF ( LEN ( _txt ) > 0, _txt, "—" )
+			)
+		displayFolder: Guide
+		lineageTag: 06fcdda6-04b1-558b-b28b-95ef42e3b722
+
+	/// Usage / objet en sortie selon le classeur COMMANDES_DAX pour UNE fonction (« — » si aucun, vide sur une ligne Total)
+	measure 'Utilisation maison' =
+			IF (
+			    HASONEVALUE ( DaxFunctions[NomFonctionDAX] ),
+			    VAR _txt =
+			        CONCATENATEX (
+			            FILTER ( VALUES ( DATA_DAX[Utilisation - Objet en sortie] ), LEN ( DATA_DAX[Utilisation - Objet en sortie] ) > 0 ),
+			            DATA_DAX[Utilisation - Objet en sortie],
+			            " | "
+			        )
+			    RETURN
+			        IF ( LEN ( _txt ) > 0, _txt, "—" )
+			)
+		displayFolder: Guide
+		lineageTag: 7cf9a56f-fecb-5b97-b6bd-470e15edc54c
+
+	/// Texte de l'encart « Mise à jour » (bouton natif du bandeau)
+	measure _Date_MAJ = "Mise à jour des données : " & SELECTEDVALUE ( _Actualisation[LibelleActualisation] )
+		displayFolder: Affichage
+		lineageTag: 6fac3502-e041-568a-b425-43ed6a3bad16
+
+	/// Grille HTML des cartes du Top 25 (filtrée par le segment Niveau)
+	measure _Top25_HTML =
+			VAR _style = "<style>*{box-sizing:border-box;margin:0;padding:0;font-family:Calibri,sans-serif;}body{background:transparent;padding:4px;}.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;}.card{background:#162A45;border-radius:10px;padding:16px 18px;position:relative;border:1px solid #2A3F5E;min-width:0;}.card.e{border-left:6px solid #21918C;}.card.c{border-left:6px solid #5EC962;}.card.a{border-left:6px solid #FDE725;}.rg{position:absolute;top:12px;right:15px;font-size:15px;color:#9D9D9D;}.bd{display:inline-block;font-size:13px;padding:3px 11px;border-radius:12px;margin-bottom:8px;font-weight:700;}.bd.e{background:#21918C;color:#0B0B0B;}.bd.c{background:#5EC962;color:#0B0B0B;}.bd.a{background:#FDE725;color:#0B0B0B;}.nm{font-size:21px;font-weight:700;color:#FFFFFF;font-family:Consolas,monospace;margin-bottom:6px;}.dc{font-size:15px;color:#9D9D9D;line-height:1.4;margin-bottom:10px;min-height:40px;}.sx{background:#1E1E1E;border-radius:6px;padding:8px 11px;font-size:13px;color:#9CDCFE;font-family:Consolas,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.ex{font-size:14px;color:#9D9D9D;margin-top:8px;font-style:italic;}.fp{display:inline-block;margin-left:6px;font-size:13px;padding:3px 10px;border-radius:12px;margin-bottom:8px;font-weight:700;background:#2A3F5E;color:#FFFFFF;}</style>"
+			VAR _cartes =
+			    CONCATENATEX (
+			        TopFonctionsDAX,
+			        -- Pastille « Fiche pratique » si la fonction a une fiche (SUM est traitée dans la fiche SUMX)
+			        VAR _n = TopFonctionsDAX[NomFonctionDAX]
+			        VAR _aFiche = _n = "SUM" || _n IN VALUES ( Exemples[Fonction] )
+			        RETURN
+			            IF (
+			                _aFiche,
+			                SUBSTITUTE ( TopFonctionsDAX[CardHTML], "<div class='nm'>", "<span class='fp'>📘 Fiche pratique</span><div class='nm'>" ),
+			                TopFonctionsDAX[CardHTML]
+			            ),
+			        "",
+			        TopFonctionsDAX[Rang], ASC
+			    )
+			RETURN
+			    _style & "<div class='grid'>" & _cartes & "</div>"
+		displayFolder: HTML
+		lineageTag: 78d14060-50d6-4510-a0f6-dc294151760b
+
+	/// Formule colorée de la fiche (filtre visuel sur Exemples[Fonction])
+	measure _Code_HTML = LOOKUPVALUE ( _Fiches_Code[CodeHTML], _Fiches_Code[Fonction], SELECTEDVALUE ( Exemples[Fonction] ) )
+		displayFolder: HTML
+		lineageTag: c376c51c-44b7-1fbe-9da4-fb0bad98a5b0
+
+	/// Points clés de la fiche (filtre visuel sur Exemples[Fonction]). Mise en forme : colonne Exemples[RetenirHTML]
+	measure _Retenir_HTML = SELECTEDVALUE ( Exemples[RetenirHTML] )
+		displayFolder: HTML
+		lineageTag: 358cc74d-7701-e988-31cf-0b8a297d24e4
+
+	/// Illustration de la page d'accueil : une fiche CALCULATE en direct
+	measure _Illustration_Accueil_HTML =
+			VAR _code = LOOKUPVALUE ( _Fiches_Code[CodeHTMLApercu], _Fiches_Code[Fonction], "CALCULATE" )
+			VAR _max = MAXX ( VALUES ( Produits[Marque] ), [Ventes] )
+			VAR _barres =
+			    CONCATENATEX (
+			        VALUES ( Produits[Marque] ),
+			        VAR _v = [Ventes]
+			        VAR _s = [Ventes Smartphones]
+			        RETURN
+			            "<div style='margin:0 0 16px 0;'><div style='display:flex;justify-content:space-between;font-size:16px;color:#D4D4D4;margin-bottom:5px;'><b>"
+			                & Produits[Marque] & "</b><span style='color:#9D9D9D;'>" & FORMAT ( _v, "#,##0 €" ) & "</span></div>"
+			                & "<div style='position:relative;height:14px;background:#1B3150;border-radius:7px;'>"
+			                & "<div style='position:absolute;left:0;top:0;height:14px;border-radius:7px;background:#4A6286;width:" & FORMAT ( DIVIDE ( _v, _max ) * 100, "0" ) & "%;'></div>"
+			                & "<div style='position:absolute;left:0;top:0;height:14px;border-radius:7px;background:#56B4E9;width:" & FORMAT ( DIVIDE ( _s, _max ) * 100, "0" ) & "%;'></div>"
+			                & "</div></div>",
+			        "",
+			        [Ventes], DESC
+			    )
+			RETURN
+			    "<div style='display:flex;gap:28px;font-family:Calibri,sans-serif;'>"
+			        & "<div style='flex:1.25;min-width:0;'><div style='font-size:15px;font-weight:700;color:#9D9D9D;letter-spacing:1px;margin-bottom:10px;'>LA FORMULE</div>" & _code & "</div>"
+			        & "<div style='flex:1;min-width:0;'><div style='font-size:15px;font-weight:700;color:#9D9D9D;letter-spacing:1px;margin-bottom:10px;'>LE RÉSULTAT (DONNÉES FICTIVES)</div>"
+			        & "<div style='font-size:13px;color:#9D9D9D;margin-bottom:14px;'><span style='display:inline-block;width:12px;height:12px;background:#56B4E9;border-radius:3px;'></span> Ventes Smartphones &nbsp;&nbsp;"
+			        & "<span style='display:inline-block;width:12px;height:12px;background:#4A6286;border-radius:3px;'></span> Ventes totales</div>"
+			        & _barres & "</div></div>"
+		displayFolder: HTML
+		lineageTag: 37aa90fb-b877-d960-e727-4fb61b22e154
+
+	/// Somme des montants de commande (mesure de base)
+	measure Ventes = SUM ( Commandes[Montant] )
+		formatString: #,0\ €;-#,0\ €;#,0\ €
+		displayFolder: Exemples
+		lineageTag: 63d6c7a6-64f3-f74d-8bfe-94a602512a77
+
+	/// CALCULATE : ventes filtrées sur la catégorie Smartphones
+	measure 'Ventes Smartphones' =
+			CALCULATE (
+			    [Ventes],
+			    Produits[Categorie] = "Smartphones"
+			)
+		formatString: #,0\ €;-#,0\ €;#,0\ €
+		displayFolder: Exemples
+		lineageTag: 100eb966-02f9-1687-8d2c-20e67a3b9d74
+
+	/// Part des smartphones dans les ventes
+	measure 'Part Smartphones %' = DIVIDE ( [Ventes Smartphones], [Ventes] )
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		displayFolder: Exemples
+		lineageTag: 34e365f4-3e4d-aabe-ddd6-6376ead66f13
+
+	/// SUMX : quantité × prix catalogue, calculé ligne à ligne
+	measure 'Ventes au prix catalogue' =
+			SUMX (
+			    Commandes,
+			    Commandes[Quantite] * RELATED ( Produits[PrixUnitaire] )
+			)
+		formatString: #,0\ €;-#,0\ €;#,0\ €
+		displayFolder: Exemples
+		lineageTag: 69fb9adb-f218-5d28-8c39-d4b04595e1e4
+
+	/// COUNTROWS : nombre de lignes de vente
+	measure 'Nb lignes de vente' = COUNTROWS ( Commandes )
+		formatString: #,0
+		displayFolder: Exemples
+		lineageTag: 354c91f9-8ff4-4713-3107-7d585b245660
+
+	/// COUNTROWS + CALCULATE : nombre de lignes de plus de 1 000 € (filtre sur une colonne, pas sur la table)
+	measure 'Nb ventes > 1000' =
+			CALCULATE (
+			    COUNTROWS ( Commandes ),
+			    Commandes[Montant] > 1000
+			)
+		formatString: #,0
+		displayFolder: Exemples
+		lineageTag: 73ad54f4-9d60-1218-5529-d296873fb4cd
+
+	/// RANKX : rang du produit selon les ventes (vide sur la ligne Total)
+	measure 'Rang produit' =
+			IF (
+			    HASONEVALUE ( Produits[Produit] ),
+			    RANKX (
+			        ALL ( Produits[Produit] ),
+			        [Ventes],
+			        ,
+			        DESC,
+			        DENSE
+			    )
+			)
+		formatString: 0
+		displayFolder: Exemples
+		lineageTag: a5f1f667-a9a1-d1b2-4ac2-b7f94d9fb88d
+
+	/// DATEADD : ventes de la même période l'année précédente
+	measure 'Ventes N-1' =
+			CALCULATE (
+			    [Ventes],
+			    DATEADD ( Calendrier[Date], -1, YEAR )
+			)
+		formatString: #,0\ €;-#,0\ €;#,0\ €
+		displayFolder: Exemples
+		lineageTag: 89f61841-9797-8b6e-1c9b-195c01f84c9e
+
+	/// Évolution des ventes par rapport à N-1
+	measure 'Évolution vs N-1 %' =
+			DIVIDE (
+			    [Ventes] - [Ventes N-1],
+			    [Ventes N-1]
+			)
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		displayFolder: Exemples
+		lineageTag: 6f8bd38c-20c8-40a4-8d76-fff8d8709abd
+
+	/// SWITCH : code couleur de l'évolution (mise en forme conditionnelle). Couleurs du thème (adaptées au daltonisme) : bon = bleu / neutre = gris / mauvais = orange
+	measure 'Couleur évolution' =
+			SWITCH (
+			    TRUE (),
+			    ISBLANK ( [Évolution vs N-1 %] ), "#9D9D9D",  // pas de N-1
+			    [Évolution vs N-1 %] >= 0, "#6BAED6",          // bleu
+			    [Évolution vs N-1 %] >= -0.1, "#9D9D9D",       // gris
+			    "#E69F00"                                      // orange
+			)
+		displayFolder: Exemples
+		lineageTag: d3e4031f-21a4-030a-03c1-7876603218a9
+
+	/// COALESCE : affiche 0 au lieu d'un vide
+	measure 'Ventes (0 si vide)' = COALESCE ( [Ventes], 0 )
+		formatString: #,0\ €;-#,0\ €;#,0\ €
+		displayFolder: Exemples
+		lineageTag: a989aadc-548c-f796-fe19-90fe23b4cb81
+
+	/// FORMAT : phrase construite à partir d'une date et d'un montant
+	measure 'Message ventes' =
+			IF (
+			    HASONEVALUE ( Calendrier[Date] ),
+			    "Ventes du "
+			        & FORMAT ( SELECTEDVALUE ( Calendrier[Date] ), "dddd d mmmm yyyy" )
+			        & " : " & FORMAT ( [Ventes], "#,##0 €" ),
+			    "Total de la période : " & FORMAT ( [Ventes], "#,##0 €" )
+			)
+		displayFolder: Exemples
+		lineageTag: c3c0fd1b-a5cb-58a1-f044-42274f194bb6
+
+	/// USERELATIONSHIP : ventes ventilées selon la date d'expédition
+	measure 'Ventes date expédition' =
+			CALCULATE (
+			    [Ventes],
+			    USERELATIONSHIP ( Commandes[DateExpedition], Calendrier[Date] )
+			)
+		formatString: #,0\ €;-#,0\ €;#,0\ €
+		displayFolder: Exemples
+		lineageTag: 9aab38d6-a75b-8c89-3650-de0684dac7c1
+
+	/// REMOVEFILTERS : ventes en ignorant le filtre Marque
+	measure 'Ventes toutes marques' =
+			CALCULATE (
+			    [Ventes],
+			    REMOVEFILTERS ( Produits[Marque] )
+			)
+		formatString: #,0\ €;-#,0\ €;#,0\ €
+		displayFolder: Exemples
+		lineageTag: 22088316-d14d-1221-4374-b10cf86cc005
+
+	/// Part de la marque dans le total
+	measure 'Part de la marque %' = DIVIDE ( [Ventes], [Ventes toutes marques] )
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		displayFolder: Exemples
+		lineageTag: 5124032c-d582-9988-c2fb-790b1d15ceff
+
+	/// TOTALYTD : cumul depuis le 1er janvier
+	measure 'Ventes cumul annuel' = TOTALYTD ( [Ventes], Calendrier[Date] )
+		formatString: #,0\ €;-#,0\ €;#,0\ €
+		displayFolder: Exemples
+		lineageTag: 326ee092-a73d-0261-94b0-edae6ae484c6
+
+	/// PREVIOUSMONTH : ventes du mois précédent
+	measure 'Ventes mois précédent' =
+			CALCULATE (
+			    [Ventes],
+			    PREVIOUSMONTH ( Calendrier[Date] )
+			)
+		formatString: #,0\ €;-#,0\ €;#,0\ €
+		displayFolder: Exemples
+		lineageTag: 20ab281b-d4af-9df3-d87b-d6dca881409f
+
+	/// Fiche détail HTML de la fonction choisie dans le Guide (description, syntaxe, retour, remarques, exemples, fiche maison)
+	measure _Guide_Fiche_HTML =
+			-- Fiche détail du Guide (visuel HTML Content) : s'affiche quand la liste ne contient qu'UNE fonction
+			-- (clic sur une ligne, ou recherche qui ne renvoie qu'un résultat)
+			IF (
+			    NOT HASONEVALUE ( DaxFunctions[NomFonctionDAX] ),
+			    "<div style='font-family:Calibri,sans-serif;color:#9D9D9D;font-size:19px;line-height:1.5;padding:60px 30px;text-align:center;'>"
+			        & "Cliquez sur une fonction de la liste pour afficher sa fiche.<br>"
+			        & "<span style='font-size:15px;'>Si la recherche ne renvoie qu'une fonction, sa fiche s'affiche directement.</span></div>",
+			    VAR _nom = SELECTEDVALUE ( DaxFunctions[NomFonctionDAX] )
+			    VAR _cat = COALESCE ( SELECTEDVALUE ( DaxFunctions[ToutesCategories] ), SELECTEDVALUE ( DaxFunctions[DaxFunctionTypes] ) )
+			    VAR _desc = COALESCE ( SELECTEDVALUE ( DaxFunctions[DescriptionFonction] ), SELECTEDVALUE ( DaxFunctions[DescriptionCourte] ) )
+			    VAR _syn = SELECTEDVALUE ( DaxFunctions[SyntaxeFonction] )
+			    VAR _ret = SELECTEDVALUE ( DaxFunctions[ValeurRetour] )
+			    VAR _rem = SELECTEDVALUE ( DaxFunctions[Remarques] )
+			    VAR _ex = SELECTEDVALUE ( DaxFunctions[Exemples] )
+			    VAR _remM = [Remarques maison]
+			    VAR _utiM = [Utilisation maison]
+			    VAR _exM =
+			        CONCATENATEX ( FILTER ( VALUES ( DATA_DAX[Exemple] ), LEN ( DATA_DAX[Exemple] ) > 0 ), DATA_DAX[Exemple], " | " )
+			    -- Les textes sont échappés : la syntaxe Microsoft contient <expression>, <table>...
+			    VAR _hDesc = IF ( LEN ( _desc ) > 0, "<div class='tx'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _desc, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & "</div>", "<div class='nr'>Non renseigné</div>" )
+			    VAR _hSyn = IF ( LEN ( _syn ) > 0, "<div class='cd'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _syn, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & "</div>", "<div class='nr'>Non renseigné</div>" )
+			    VAR _hRet = IF ( LEN ( _ret ) > 0, "<div class='tx'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _ret, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & "</div>", "<div class='nr'>Non renseigné</div>" )
+			    VAR _hRem = IF ( LEN ( _rem ) > 0, "<ul><li style='font-size:16px;line-height:1.45;margin-bottom:6px;color:#D4D4D4;'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _rem, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ), " | ", "</li><li style='font-size:16px;line-height:1.45;margin-bottom:6px;color:#D4D4D4;'>" ) & "</li></ul>", "<div class='nr'>Non renseigné</div>" )
+			    VAR _hEx = IF ( LEN ( _ex ) > 0, "<div class='cd'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _ex, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ), " | ", "</div><div class='cd'>" ) & "</div>", "<div class='nr'>Non renseigné</div>" )
+			    -- Matrice d'usage du classeur : symbole + texte (jamais la couleur seule)
+			    -- Les symboles sont convertis en OUI / PRECAUTION / NON dans Power Query (table DATA_DAX)
+			    VAR _mCol = TRIM ( CONCATENATEX ( VALUES ( DATA_DAX[Cal_Column] ), DATA_DAX[Cal_Column], "" ) )
+			    VAR _mTab = TRIM ( CONCATENATEX ( VALUES ( DATA_DAX[Cal_Table] ), DATA_DAX[Cal_Table], "" ) )
+			    VAR _mMes = TRIM ( CONCATENATEX ( VALUES ( DATA_DAX[Mesure] ), DATA_DAX[Mesure], "" ) )
+			    VAR _mVis = TRIM ( CONCATENATEX ( VALUES ( DATA_DAX[Cal_Visuel] ), DATA_DAX[Cal_Visuel], "" ) )
+			    VAR _aMat = LEN ( _mCol & _mTab & _mMes & _mVis ) > 0
+			    VAR _hMat =
+			        IF (
+			            _aMat,
+			            "<div class='lb'>UTILISABLE DANS</div><div class='mx'>"
+			                & "<div class='mc " & SWITCH ( _mCol, "OUI", "ok", "PRECAUTION", "wa", "NON", "ko", "nd" ) & "'><b>" & SWITCH ( _mCol, "OUI", "✔ Oui", "PRECAUTION", "❗ Avec précaution", "NON", "✖ Non", "? Non renseigné" ) & "</b><span>Colonne calculée</span></div>"
+			                & "<div class='mc " & SWITCH ( _mTab, "OUI", "ok", "PRECAUTION", "wa", "NON", "ko", "nd" ) & "'><b>" & SWITCH ( _mTab, "OUI", "✔ Oui", "PRECAUTION", "❗ Avec précaution", "NON", "✖ Non", "? Non renseigné" ) & "</b><span>Table calculée</span></div>"
+			                & "<div class='mc " & SWITCH ( _mMes, "OUI", "ok", "PRECAUTION", "wa", "NON", "ko", "nd" ) & "'><b>" & SWITCH ( _mMes, "OUI", "✔ Oui", "PRECAUTION", "❗ Avec précaution", "NON", "✖ Non", "? Non renseigné" ) & "</b><span>Mesure</span></div>"
+			                & "<div class='mc " & SWITCH ( _mVis, "OUI", "ok", "PRECAUTION", "wa", "NON", "ko", "nd" ) & "'><b>" & SWITCH ( _mVis, "OUI", "✔ Oui", "PRECAUTION", "❗ Avec précaution", "NON", "✖ Non", "? Non renseigné" ) & "</b><span>Calcul visuel</span></div>"
+			                & "</div>"
+			        )
+			    VAR _aMaison = _remM <> "—" || _utiM <> "—" || LEN ( _exM ) > 0 || _aMat
+			    VAR _hMaison =
+			        IF (
+			            _aMaison,
+			            "<div class='lb'>FICHE MAISON (CLASSEUR COMMANDES_DAX)</div><div class='mz'>"
+			                    & _hMat
+			                & IF ( _utiM <> "—", "<div class='lb'>UTILISATION</div><div class='tx'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _utiM, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & "</div>" )
+			                & IF ( LEN ( _exM ) > 0, "<div class='lb'>EXEMPLE</div><div class='cd'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _exM, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ), " | ", "</div><div class='cd'>" ) & "</div>" )
+			                & IF ( _remM <> "—", "<div class='lb'>REMARQUES</div><div class='tx'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _remM, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ), " | ", "<br>" ) & "</div>" )
+			                & "</div>",
+			            "<div class='lb'>FICHE MAISON (CLASSEUR COMMANDES_DAX)</div><div class='nr'>Non renseigné</div>"
+			        )
+			    RETURN
+			        "<style>*{box-sizing:border-box;margin:0;padding:0;font-family:Calibri,sans-serif;}.f{padding:4px 8px 8px 4px;color:#D4D4D4;}.nm{font-family:Consolas,monospace;font-size:28px;font-weight:700;color:#FFFFFF;}.ct{display:inline-block;margin:6px 0 2px;font-size:13px;font-weight:700;background:#1E1E1E;color:#9CDCFE;padding:3px 11px;border-radius:12px;}.lb{font-size:13px;font-weight:700;color:#9D9D9D;letter-spacing:1px;margin:16px 0 6px;}.tx{font-size:16px;line-height:1.45;}.cd{background:#1E1E1E;color:#9CDCFE;font-family:Consolas,monospace;font-size:14px;line-height:1.45;border-radius:6px;padding:10px 12px;white-space:pre-wrap;word-break:break-word;margin-bottom:8px;}.nr{font-size:15px;color:#9D9D9D;font-style:italic;}ul{padding-left:20px;}li{margin-bottom:6px;font-size:16px;line-height:1.45;}.mz{background:#1B3150;border-left:5px solid #6BAED6;border-radius:6px;padding:10px 14px;margin-top:4px;}.mz .lb{margin-top:8px;}.mz .lb:first-child{margin-top:0;}.mx{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;}.mc{flex:1 1 130px;border-radius:8px;padding:8px 10px;border:2px solid;}.mc b{display:block;font-size:15px;}.mc span{font-size:13px;color:#D4D4D4;}.ok{border-color:#56B4E9;}.ok b{color:#56B4E9;}.wa{border-color:#E69F00;}.wa b{color:#E69F00;}.ko{border-color:#D55E00;border-style:dashed;}.ko b{color:#FF8A50;}.nd{border-color:#2A3F5E;}.nd b{color:#9D9D9D;}</style><div class='f'>"
+			            & "<div class='nm'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _nom, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & "</div>"
+			            & IF ( LEN ( _cat ) > 0, "<span class='ct'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _cat, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & "</span>" )
+			            & "<div class='lb'>DESCRIPTION</div>" & _hDesc
+			            & "<div class='lb'>SYNTAXE</div>" & _hSyn
+			            & "<div class='lb'>VALEUR DE RETOUR</div>" & _hRet
+			            & "<div class='lb'>REMARQUES</div>" & _hRem
+			            & "<div class='lb'>EXEMPLES</div>" & _hEx
+			            & _hMaison
+			            & "</div>"
+			)
+		displayFolder: HTML
+		lineageTag: 6702ff19-5947-5030-ac44-ba30d3a6a08b
+
+	/// Texte du bouton « Documentation » sous la fiche du Guide (vide sans fonction choisie)
+	measure _Guide_Doc_Texte = IF ( HASONEVALUE ( DaxFunctions[NomFonctionDAX] ), "📖  Documentation Microsoft Learn : " & SELECTEDVALUE ( DaxFunctions[NomFonctionDAX] ) & "  ↗" )
+		displayFolder: Guide
+		lineageTag: 07fafdcd-4b98-506c-b6a8-a7a01ad7338a
+
+	/// Adresse de la documentation Microsoft Learn de la fonction choisie (action du bouton)
+	measure _Guide_Doc_URL = IF ( HASONEVALUE ( DaxFunctions[NomFonctionDAX] ), SELECTEDVALUE ( DaxFunctions[URLReference] ) )
+		displayFolder: Guide
+		lineageTag: d90d2d85-5a24-507e-834a-3f012ccc47cd
+
+	/// Nombre de fonctions dans la liste (selon les filtres de la page)
+	measure _Guide_Nb_Fonctions = COUNTROWS ( DaxFunctions ) + 0
+		formatString: #,0
+		displayFolder: Guide
+		lineageTag: ab2528b5-1e56-57c7-bfb0-48633814446a
+
+	/// Fiche USERELATIONSHIP : « Oui → mois » si la ligne de commande est expédiée un autre mois que celui de la commande
+	measure _Change_De_Mois =
+			IF (
+			    HASONEVALUE ( Commandes[NumLigne] ),
+			    VAR _cde = MAX ( Commandes[DateCommande] )
+			    VAR _exp = MAX ( Commandes[DateExpedition] )
+			    RETURN
+			        IF ( FORMAT ( _exp, "yyyy-MM" ) <> FORMAT ( _cde, "yyyy-MM" ), "Oui → " & FORMAT ( _exp, "mmmm yyyy" ), "Non" )
+			)
+		displayFolder: Affichage
+		lineageTag: dddb1997-a387-5e8e-a84d-039607637fbd
+
+	partition _TableMesures = m
+		mode: import
+		queryGroup: Tables
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Colonne 1" = _t]),
+				    #"Type modifié" = Table.TransformColumnTypes(Source,{{"Colonne 1", type text}}),
+				    #"Colonnes supprimées" = Table.RemoveColumns(#"Type modifié",{"Colonne 1"})
+				in
+				    #"Colonnes supprimées"
+
+	annotation PBI_ResultType = Table
+

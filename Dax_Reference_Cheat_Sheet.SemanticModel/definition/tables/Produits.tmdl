@@ -1,0 +1,93 @@
+/// Données fictives : produits
+table Produits
+	lineageTag: 2421201d-0e68-1ee3-0da6-1ccb13505928
+
+	column ProduitKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e67e6548-a797-e264-ad78-cdbca5f4f742
+		summarizeBy: none
+		sourceColumn: ProduitKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Produit
+		dataType: string
+		lineageTag: ffe8af60-3bee-fba8-3262-1a5ecbc53dd0
+		summarizeBy: none
+		sourceColumn: Produit
+
+		annotation SummarizationSetBy = Automatic
+
+	column Marque
+		dataType: string
+		lineageTag: 713eefc0-d291-3ab7-1158-ee03dd087ab9
+		summarizeBy: none
+		sourceColumn: Marque
+
+		annotation SummarizationSetBy = Automatic
+
+	column Categorie
+		dataType: string
+		lineageTag: 16385da5-dbdc-6247-e3a3-d341bfb117a4
+		summarizeBy: none
+		sourceColumn: Categorie
+
+		annotation SummarizationSetBy = Automatic
+
+	column PrixUnitaire
+		dataType: double
+		formatString: #,0\ €;-#,0\ €;#,0\ €
+		lineageTag: f05c6205-9761-577c-db54-605789e9bca5
+		summarizeBy: none
+		sourceColumn: PrixUnitaire
+
+		annotation SummarizationSetBy = Automatic
+
+	column Poids
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 97793812-69fe-4dd8-6794-a3f89b4149cd
+		summarizeBy: none
+		sourceColumn: Poids
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Produits = m
+		mode: import
+		queryGroup: Exemples
+		source =
+				// ============================================================
+				// TABLE : Produits (DONNÉES FICTIVES — fiches exemples)
+				// 14 produits de 5 marques imaginaires. Poids = fréquence de tirage
+				// dans Commandes (Kalisto est volontairement rare : fiche COALESCE)
+				// ============================================================
+				let
+				    Source = #table(
+				        type table [ProduitKey = Int64.Type, Produit = text, Marque = text, Categorie = text, PrixUnitaire = number, Poids = Int64.Type],
+				        {
+				            { 1, "Novatek Phone 15 Pro",        "Novatek",     "Smartphones",  1199, 18},
+				            { 2, "Novatek Phone 15",            "Novatek",     "Smartphones",   899, 22},
+				            { 3, "Novatek Tab 11",              "Novatek",     "Tablettes",     649, 10},
+				            { 4, "Novatek Montre S",            "Novatek",     "Accessoires",   349,  6},
+				            { 5, "Lumeo R9 Ultra",            "Lumeo",     "Smartphones",  1099, 15},
+				            { 6, "Lumeo R7",                  "Lumeo",     "Smartphones",   449, 25},
+				            { 7, "Lumeo Tab S",               "Lumeo",     "Tablettes",     399,  8},
+				            { 8, "Lumeo Écouteurs Buds",      "Lumeo",     "Audio",          99, 12},
+				            { 9, "Ortiva Chargeur 65W",         "Ortiva",      "Accessoires",    49, 30},
+				            {10, "Ortiva Batterie 20000",       "Ortiva",      "Accessoires",    39, 28},
+				            {11, "Ortiva Câble USB-C 2 m",      "Ortiva",      "Accessoires",    19, 35},
+				            {12, "Zentra Casque NC700",       "Zentra",    "Audio",         299,  9},
+				            {13, "Zentra Écouteurs Pods",     "Zentra",    "Audio",         179, 14},
+				            {14, "Kalisto Enceinte Hi-Fi",  "Kalisto", "Audio",        1490,  1}
+				        }
+				    )
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,41 @@
+/// Contrôle : fonctions scrapées Microsoft absentes de l'Excel
+table _Ecarts_DaxFunctions_vs_Excel
+	lineageTag: 1d03c6b2-82f7-4912-9790-8c65eed67251
+
+	column Fonction
+		dataType: string
+		lineageTag: 997b0f6d-792c-4192-b25c-bd6f9b35cf32
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Fonction]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nature
+		dataType: string
+		lineageTag: 04a15978-9741-46ce-a848-ef72fc0b0855
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Nature]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Description
+		dataType: string
+		lineageTag: caab7f2a-6acc-458d-a8f6-a770599b1a89
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Description]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Ecarts_DaxFunctions_vs_Excel = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+				    FILTER ( DaxFunctions, NOT DaxFunctions[NomFonctionDAX] IN VALUES ( DATA_DAX[Fonction DAX] ) ),
+				    "Fonction", DaxFunctions[NomFonctionDAX],
+				    "Nature", DaxFunctions[DaxFunctionTypes],
+				    "Description", DaxFunctions[DescriptionCourte]
+				)
+

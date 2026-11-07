@@ -1,0 +1,87 @@
+/// Table de dates (marquée comme table de dates)
+table Calendrier
+	lineageTag: 5f80c19d-2dee-0d22-794b-491def6b7904
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: dd/mm/yyyy
+		lineageTag: 287a8ff1-3930-f73f-7cdd-e25fd668c67d
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Annee
+		dataType: int64
+		formatString: 0
+		lineageTag: 9ea7abe9-85e4-edda-6a8a-2e58bda8eaeb
+		summarizeBy: none
+		sourceColumn: Annee
+
+		annotation SummarizationSetBy = Automatic
+
+	column Trimestre
+		dataType: string
+		lineageTag: 4c521a0c-3b48-0f4d-f780-4824e4d6f9b7
+		summarizeBy: none
+		sourceColumn: Trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column MoisNum
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 98deb7f5-047a-37e4-8538-e921eabd72df
+		summarizeBy: none
+		sourceColumn: MoisNum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mois
+		dataType: string
+		lineageTag: bd3c27f4-ad3b-a97e-57d0-4fd18a0cb8a7
+		summarizeBy: none
+		sourceColumn: Mois
+		sortByColumn: MoisNum
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnneeMois
+		dataType: string
+		lineageTag: 45d56e96-8b99-7e14-68ad-bda4be3776bd
+		summarizeBy: none
+		sourceColumn: AnneeMois
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Calendrier = m
+		mode: import
+		queryGroup: Exemples
+		source =
+				// ============================================================
+				// TABLE : Calendrier (table de dates, marquée comme telle)
+				// Une ligne par jour du 01/01/2022 au 31/12/2026
+				// (2026 couvre les expéditions de fin décembre 2025 : relation inactive DateExpedition)
+				// ============================================================
+				let
+				    DateDebut = #date(2022, 1, 1),
+				    DateFin   = #date(2026, 12, 31),
+				    ListeDates = List.Dates(DateDebut, Duration.Days(DateFin - DateDebut) + 1, #duration(1, 0, 0, 0)),
+				    Source = Table.FromList(ListeDates, Splitter.SplitByNothing(), type table [Date = date]),
+				    #"Ajout Année"     = Table.AddColumn(Source, "Annee", each Date.Year([Date]), Int64.Type),
+				    #"Ajout Trimestre" = Table.AddColumn(#"Ajout Année", "Trimestre", each "T" & Text.From(Date.QuarterOfYear([Date])), type text),
+				    #"Ajout N° mois"   = Table.AddColumn(#"Ajout Trimestre", "MoisNum", each Date.Month([Date]), Int64.Type),
+				    #"Ajout Mois"      = Table.AddColumn(#"Ajout N° mois", "Mois", each Date.MonthName([Date], "fr-FR"), type text),
+				    #"Ajout Année-mois" = Table.AddColumn(#"Ajout Mois", "AnneeMois", each Date.ToText([Date], "yyyy-MM"), type text)
+				in
+				    #"Ajout Année-mois"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

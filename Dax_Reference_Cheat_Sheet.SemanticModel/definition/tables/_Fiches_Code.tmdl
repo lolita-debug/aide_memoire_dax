@@ -1,0 +1,275 @@
+/// Formules des fiches pratiques, lues dans les mesures du modèle (INFO.VIEW.MEASURES)
+table _Fiches_Code
+	isHidden
+	lineageTag: 447aeb53-ae6d-54f4-b49b-83ac2efae810
+
+	/// Fonction de la fiche (clé vers Exemples[Fonction])
+	column Fonction
+		dataType: string
+		lineageTag: 472621fc-57ca-5515-9846-a14c27fff12b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Fonction]
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Mesures affichées (copie de Exemples[Mesures])
+	column Mesures
+		dataType: string
+		lineageTag: 20466835-3d1a-5372-a280-64594776ee52
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mesures]
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Formule en clair
+	column CodeDAX
+		dataType: string
+		lineageTag: 1eeee182-ec36-54a4-bdee-5662aacef8de
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [CodeDAX]
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Formule colorée (visuel HTML Content)
+	column CodeHTML
+		dataType: string
+		lineageTag: 20c56fd4-5540-5eba-85eb-8cc030cd8e7c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [CodeHTML]
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Aperçu coloré (2 mesures) pour l'accueil
+	column CodeHTMLApercu
+		dataType: string
+		lineageTag: e2f13b0f-1187-535f-a588-27008d0153f5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [CodeHTMLApercu]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Fiches_Code = calculated
+		mode: import
+		source =
+				-- Formules des fiches, lues dans les VRAIES mesures du modèle.
+				-- C'est le SEUL objet du modèle qui appelle INFO.VIEW.MEASURES : plusieurs objets calculés
+				-- qui l'appellent créent une dépendance circulaire (erreur « référence cyclique »).
+				-- Recalculée à l'actualisation (clic droit sur la table > Actualiser les données).
+				ADDCOLUMNS (
+				    SELECTCOLUMNS ( Exemples, "Fonction", Exemples[Fonction], "Mesures", Exemples[Mesures] ),
+				    "CodeDAX",
+						-- Formule en clair de la fiche, lue dans les VRAIES mesures du modèle (sert au contrôle « mesures introuvables »)
+						VAR _defs = SELECTCOLUMNS ( INFO.VIEW.MEASURES (), "Nom", [Name], "Expr", [Expression] )
+						VAR _liste = [Mesures]
+						RETURN
+						    CONCATENATEX (
+						        GENERATESERIES ( 1, PATHLENGTH ( _liste ) ),
+						        VAR _nom = PATHITEM ( _liste, [Value] )
+						        RETURN
+						            _nom & " =" & UNICHAR ( 10 ) & COALESCE ( SUBSTITUTE ( MAXX ( FILTER ( _defs, [Nom] = _nom ), [Expr] ), UNICHAR ( 13 ), "" ), "// mesure introuvable" ),
+						        UNICHAR ( 10 ) & UNICHAR ( 10 ),
+						        [Value], ASC
+						    ),
+				    "CodeHTML",
+						-- Formule colorée de la fiche, lue dans les VRAIES mesures du modèle (INFO.VIEW.MEASURES).
+						-- [Mesures] = noms des mesures séparés par « | ». Recalculée à l'actualisation de la table Exemples.
+						-- Coloration sans expressions régulières, pour un code écrit à la façon DAX Formatter (« FONCTION ( » avec un espace) :
+						--   mot suivi de « ( » = fonction · [Mesure] · Table[Colonne] · "texte" · nombre · // commentaire · mots-clés de _motsCles
+						VAR _motsCles = { "VAR", "RETURN", "DESC", "ASC", "DENSE", "SKIP", "YEAR", "QUARTER", "MONTH", "DAY", "IN", "NOT", "&&", "||" }
+						VAR _defs = SELECTCOLUMNS ( INFO.VIEW.MEASURES (), "Nom", [Name], "Expr", [Expression] )
+						VAR _liste = [Mesures]
+						VAR _corps =
+						    CONCATENATEX (
+						        GENERATESERIES ( 1, PATHLENGTH ( _liste ) ),
+						        VAR _num = [Value]
+						        VAR _nom = PATHITEM ( _liste, _num )
+						        VAR _exprBrute = MAXX ( FILTER ( _defs, [Nom] = _nom ), [Expr] )
+						        VAR _expr = IF ( ISBLANK ( _exprBrute ), "// mesure introuvable : vérifier le nom dans [Mesures]", _exprBrute )
+						        -- « | » est le séparateur des fonctions PATH : on le met de côté (│) puis on le rétablit à l'affichage
+						        VAR _lignes = SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _expr, UNICHAR ( 13 ), "" ), UNICHAR ( 9 ), "    " ), "|", UNICHAR ( 9474 ) ), UNICHAR ( 10 ), "|" )
+						        RETURN
+						            IF ( _num > 1, "<div class='l'> </div>" )
+						                & "<div class='l'><span class='n'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _nom, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & " =</span></div>"
+						                & CONCATENATEX (
+						                    GENERATESERIES ( 1, PATHLENGTH ( _lignes ) ),
+						                    VAR _ligne = PATHITEM ( _lignes, [Value] )
+						                    VAR _sansBlanc = TRIM ( _ligne )
+						                    VAR _retrait = IF ( _sansBlanc = "", 0, FIND ( LEFT ( _sansBlanc, 1 ), _ligne ) - 1 )
+						                    VAR _contenu = MID ( _ligne, _retrait + 1, 10000 )
+						                    VAR _posCom = FIND ( "//", _contenu, 1, 0 )
+						                    VAR _code = IF ( _posCom > 0, LEFT ( _contenu, _posCom - 1 ), _contenu )
+						                    VAR _com = IF ( _posCom > 0, MID ( _contenu, _posCom, 10000 ) )
+						                    VAR _guillemets = SUBSTITUTE ( _code, """", "|" )
+						                    VAR _htmlCode =
+						                        CONCATENATEX (
+						                            GENERATESERIES ( 1, PATHLENGTH ( _guillemets ) ),
+						                            VAR _i = [Value]
+						                            VAR _seg = PATHITEM ( _guillemets, _i )
+						                            -- segments pairs = texte entre guillemets ; impairs = code
+						                            VAR _crochets = SUBSTITUTE ( _seg, "[", "|" )
+						                            -- espaces protégés entre crochets : [Évolution vs N-1 %] reste un seul mot
+						                            VAR _protege =
+						                                PATHITEM ( _crochets, 1 )
+						                                    & CONCATENATEX (
+						                                        GENERATESERIES ( 2, PATHLENGTH ( _crochets ) ),
+						                                        VAR _s = PATHITEM ( _crochets, [Value] )
+						                                        VAR _p = FIND ( "]", _s, 1, 0 )
+						                                        RETURN
+						                                            "[" & IF ( _p > 0, SUBSTITUTE ( LEFT ( _s, _p ), " ", UNICHAR ( 160 ) ) & MID ( _s, _p + 1, 10000 ), _s ),
+						                                        "",
+						                                        [Value], ASC
+						                                    )
+						                            VAR _t = TRIM ( _protege )
+						                            VAR _mots = SUBSTITUTE ( _t, " ", "|" )
+						                            VAR _htmlMots =
+						                                CONCATENATEX (
+						                                    GENERATESERIES ( 1, PATHLENGTH ( _mots ) ),
+						                                    VAR _tok = SUBSTITUTE ( SUBSTITUTE ( PATHITEM ( _mots, [Value] ), UNICHAR ( 9474 ), "|" ), UNICHAR ( 160 ), " " )
+						                                    VAR _suiv = PATHITEM ( _mots, [Value] + 1 )
+						                                    VAR _c1 = LEFT ( _tok, 1 )
+						                                    VAR _pc = FIND ( "[", _tok, 1, 0 )
+						                                    VAR _e = SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _tok, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" )
+						                                    RETURN
+						                                        SWITCH (
+						                                            TRUE (),
+						                                            _c1 IN { "(", ")" }, "<span class='p'>" & _e & "</span>",
+						                                            LEFT ( _suiv, 1 ) = "(", "<span class='f'>" & _e & "</span>",
+						                                            SUBSTITUTE ( _tok, ",", "" ) IN _motsCles, "<span class='k'>" & _e & "</span>",
+						                                            _c1 = "[", "<span class='m'>" & _e & "</span>",
+						                                            _pc > 1, "<span class='t'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( LEFT ( _tok, _pc - 1 ), "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & "</span><span class='cl'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( MID ( _tok, _pc, 10000 ), "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & "</span>",
+						                                            _c1 IN { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" } || ( _c1 = "-" && MID ( _tok, 2, 1 ) IN { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" } ), "<span class='nb'>" & _e & "</span>",
+						                                            _e
+						                                        ),
+						                                    " ",
+						                                    [Value], ASC
+						                                )
+						                            RETURN
+						                                IF (
+						                                    ISODD ( _i ),
+						                                    IF (
+						                                        _t = "",
+						                                        _seg,
+						                                        IF ( LEFT ( _protege, 1 ) = " ", " " ) & _htmlMots & IF ( RIGHT ( _protege, 1 ) = " ", " " )
+						                                    ),
+						                                    "<span class='s'>""" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _seg, UNICHAR ( 9474 ), "|" ), "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & """</span>"
+						                                ),
+						                            "",
+						                            [Value], ASC
+						                        )
+						                    RETURN
+						                        "<div class='l'>" & REPT ( " ", _retrait ) & _htmlCode
+						                            & IF ( _posCom > 0, "<span class='cm'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _com, UNICHAR ( 9474 ), "|" ), "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & "</span>" )
+						                            & "</div>",
+						                    "",
+						                    [Value], ASC
+						                ),
+						        "",
+						        [Value], ASC
+						    )
+						RETURN
+						    "<style>.c{background:#1E1E1E;border-radius:10px;padding:18px 20px;font-family:Consolas,monospace;font-size:19px;line-height:1.55;color:#D4D4D4;counter-reset:ln;overflow:auto;}.l{white-space:pre;}.l::before{counter-increment:ln;content:counter(ln);display:inline-block;width:30px;text-align:right;margin-right:18px;color:#6E7681;}.n{color:#FFFFFF;}.f{color:#569CD6;}.p{color:#FFD700;}.k{color:#4FC1FF;}.s{color:#CE9178;}.m{color:#C586C0;}.t{color:#9CDCFE;}.cl{color:#4FC1FF;}.nb{color:#B5CEA8;}.cm{color:#6A9955;}</style><div class='c'>" & _corps & "</div>",
+				    "CodeHTMLApercu",
+						-- Formule colorée de la fiche, lue dans les VRAIES mesures du modèle (INFO.VIEW.MEASURES).
+						-- [Mesures] = noms des mesures séparés par « | ». Recalculée à l'actualisation de la table Exemples.
+						-- Coloration sans expressions régulières, pour un code écrit à la façon DAX Formatter (« FONCTION ( » avec un espace) :
+						--   mot suivi de « ( » = fonction · [Mesure] · Table[Colonne] · "texte" · nombre · // commentaire · mots-clés de _motsCles
+						VAR _motsCles = { "VAR", "RETURN", "DESC", "ASC", "DENSE", "SKIP", "YEAR", "QUARTER", "MONTH", "DAY", "IN", "NOT", "&&", "||" }
+						VAR _defs = SELECTCOLUMNS ( INFO.VIEW.MEASURES (), "Nom", [Name], "Expr", [Expression] )
+						VAR _liste = [Mesures]
+						VAR _corps =
+						    CONCATENATEX (
+						        GENERATESERIES ( 1, MIN ( 2, PATHLENGTH ( _liste ) ) ),
+						        VAR _num = [Value]
+						        VAR _nom = PATHITEM ( _liste, _num )
+						        VAR _exprBrute = MAXX ( FILTER ( _defs, [Nom] = _nom ), [Expr] )
+						        VAR _expr = IF ( ISBLANK ( _exprBrute ), "// mesure introuvable : vérifier le nom dans [Mesures]", _exprBrute )
+						        -- « | » est le séparateur des fonctions PATH : on le met de côté (│) puis on le rétablit à l'affichage
+						        VAR _lignes = SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _expr, UNICHAR ( 13 ), "" ), UNICHAR ( 9 ), "    " ), "|", UNICHAR ( 9474 ) ), UNICHAR ( 10 ), "|" )
+						        RETURN
+						            IF ( _num > 1, "<div class='l'> </div>" )
+						                & "<div class='l'><span class='n'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _nom, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & " =</span></div>"
+						                & CONCATENATEX (
+						                    GENERATESERIES ( 1, PATHLENGTH ( _lignes ) ),
+						                    VAR _ligne = PATHITEM ( _lignes, [Value] )
+						                    VAR _sansBlanc = TRIM ( _ligne )
+						                    VAR _retrait = IF ( _sansBlanc = "", 0, FIND ( LEFT ( _sansBlanc, 1 ), _ligne ) - 1 )
+						                    VAR _contenu = MID ( _ligne, _retrait + 1, 10000 )
+						                    VAR _posCom = FIND ( "//", _contenu, 1, 0 )
+						                    VAR _code = IF ( _posCom > 0, LEFT ( _contenu, _posCom - 1 ), _contenu )
+						                    VAR _com = IF ( _posCom > 0, MID ( _contenu, _posCom, 10000 ) )
+						                    VAR _guillemets = SUBSTITUTE ( _code, """", "|" )
+						                    VAR _htmlCode =
+						                        CONCATENATEX (
+						                            GENERATESERIES ( 1, PATHLENGTH ( _guillemets ) ),
+						                            VAR _i = [Value]
+						                            VAR _seg = PATHITEM ( _guillemets, _i )
+						                            -- segments pairs = texte entre guillemets ; impairs = code
+						                            VAR _crochets = SUBSTITUTE ( _seg, "[", "|" )
+						                            -- espaces protégés entre crochets : [Évolution vs N-1 %] reste un seul mot
+						                            VAR _protege =
+						                                PATHITEM ( _crochets, 1 )
+						                                    & CONCATENATEX (
+						                                        GENERATESERIES ( 2, PATHLENGTH ( _crochets ) ),
+						                                        VAR _s = PATHITEM ( _crochets, [Value] )
+						                                        VAR _p = FIND ( "]", _s, 1, 0 )
+						                                        RETURN
+						                                            "[" & IF ( _p > 0, SUBSTITUTE ( LEFT ( _s, _p ), " ", UNICHAR ( 160 ) ) & MID ( _s, _p + 1, 10000 ), _s ),
+						                                        "",
+						                                        [Value], ASC
+						                                    )
+						                            VAR _t = TRIM ( _protege )
+						                            VAR _mots = SUBSTITUTE ( _t, " ", "|" )
+						                            VAR _htmlMots =
+						                                CONCATENATEX (
+						                                    GENERATESERIES ( 1, PATHLENGTH ( _mots ) ),
+						                                    VAR _tok = SUBSTITUTE ( SUBSTITUTE ( PATHITEM ( _mots, [Value] ), UNICHAR ( 9474 ), "|" ), UNICHAR ( 160 ), " " )
+						                                    VAR _suiv = PATHITEM ( _mots, [Value] + 1 )
+						                                    VAR _c1 = LEFT ( _tok, 1 )
+						                                    VAR _pc = FIND ( "[", _tok, 1, 0 )
+						                                    VAR _e = SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _tok, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" )
+						                                    RETURN
+						                                        SWITCH (
+						                                            TRUE (),
+						                                            _c1 IN { "(", ")" }, "<span class='p'>" & _e & "</span>",
+						                                            LEFT ( _suiv, 1 ) = "(", "<span class='f'>" & _e & "</span>",
+						                                            SUBSTITUTE ( _tok, ",", "" ) IN _motsCles, "<span class='k'>" & _e & "</span>",
+						                                            _c1 = "[", "<span class='m'>" & _e & "</span>",
+						                                            _pc > 1, "<span class='t'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( LEFT ( _tok, _pc - 1 ), "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & "</span><span class='cl'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( MID ( _tok, _pc, 10000 ), "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & "</span>",
+						                                            _c1 IN { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" } || ( _c1 = "-" && MID ( _tok, 2, 1 ) IN { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" } ), "<span class='nb'>" & _e & "</span>",
+						                                            _e
+						                                        ),
+						                                    " ",
+						                                    [Value], ASC
+						                                )
+						                            RETURN
+						                                IF (
+						                                    ISODD ( _i ),
+						                                    IF (
+						                                        _t = "",
+						                                        _seg,
+						                                        IF ( LEFT ( _protege, 1 ) = " ", " " ) & _htmlMots & IF ( RIGHT ( _protege, 1 ) = " ", " " )
+						                                    ),
+						                                    "<span class='s'>""" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _seg, UNICHAR ( 9474 ), "|" ), "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & """</span>"
+						                                ),
+						                            "",
+						                            [Value], ASC
+						                        )
+						                    RETURN
+						                        "<div class='l'>" & REPT ( " ", _retrait ) & _htmlCode
+						                            & IF ( _posCom > 0, "<span class='cm'>" & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _com, UNICHAR ( 9474 ), "|" ), "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ) & "</span>" )
+						                            & "</div>",
+						                    "",
+						                    [Value], ASC
+						                ),
+						        "",
+						        [Value], ASC
+						    )
+						RETURN
+						    "<style>.c{background:#1E1E1E;border-radius:10px;padding:18px 20px;font-family:Consolas,monospace;font-size:19px;line-height:1.55;color:#D4D4D4;counter-reset:ln;overflow:auto;}.l{white-space:pre;}.l::before{counter-increment:ln;content:counter(ln);display:inline-block;width:30px;text-align:right;margin-right:18px;color:#6E7681;}.n{color:#FFFFFF;}.f{color:#569CD6;}.p{color:#FFD700;}.k{color:#4FC1FF;}.s{color:#CE9178;}.m{color:#C586C0;}.t{color:#9CDCFE;}.cl{color:#4FC1FF;}.nb{color:#B5CEA8;}.cm{color:#6A9955;}</style><div class='c'>" & _corps & "</div>"
+				)
+

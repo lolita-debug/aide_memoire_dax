@@ -1,0 +1,136 @@
+/// Contenu des 12 fiches pratiques. Saisie dans la requête (texte simple), mise en forme par les colonnes calculées.
+table Exemples
+	isHidden
+	lineageTag: bb6c9e58-6a64-c072-709c-f52319d84235
+
+	column Ordre
+		dataType: int64
+		formatString: 0
+		lineageTag: 9a3e1289-cbd6-2084-ecd5-a5d75a02b2d1
+		summarizeBy: none
+		sourceColumn: Ordre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fonction
+		dataType: string
+		lineageTag: 9a231091-7f8d-edc4-8a46-7b68d4d51d5d
+		summarizeBy: none
+		sourceColumn: Fonction
+
+		annotation SummarizationSetBy = Automatic
+
+	column Titre
+		dataType: string
+		lineageTag: e876c38e-5de6-432e-9e35-92318a7e6689
+		summarizeBy: none
+		sourceColumn: Titre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Categorie
+		dataType: string
+		lineageTag: 16385da5-dbdc-6247-e3a3-d341bfb117a4
+		summarizeBy: none
+		sourceColumn: Categorie
+
+		annotation SummarizationSetBy = Automatic
+
+	column Niveau
+		dataType: string
+		lineageTag: ed7c818f-ee68-ad63-c3b5-a3d8bdb10224
+		summarizeBy: none
+		sourceColumn: Niveau
+
+		annotation SummarizationSetBy = Automatic
+
+	column Accroche
+		dataType: string
+		lineageTag: 8e8c2546-71ef-4abb-1be8-ceae4b392aa5
+		summarizeBy: none
+		sourceColumn: Accroche
+
+		annotation SummarizationSetBy = Automatic
+
+	column URLDoc
+		dataType: string
+		lineageTag: 577d456a-7fb7-12e2-77e5-fefbc67462cb
+		dataCategory: WebUrl
+		summarizeBy: none
+		sourceColumn: URLDoc
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Mesures affichées dans la fiche, séparées par « | », dans l'ordre d'affichage (noms exacts du modèle)
+	column Mesures
+		dataType: string
+		lineageTag: ccc61e57-5c7f-583d-9159-8452171949fc
+		summarizeBy: none
+		sourceColumn: Mesures
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Points « à retenir » : puces séparées par « | » ; code entre {{ et }}
+	column Retenir
+		dataType: string
+		lineageTag: 5ca22dee-3369-5f92-b4bd-b5cf099e4e56
+		summarizeBy: none
+		sourceColumn: Retenir
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Points « à retenir » mis en forme (visuel HTML Content)
+	column RetenirHTML =
+			-- Points « à retenir » mis en forme. Saisie dans Exemples[Retenir] :
+			--   puces séparées par « | » (espace, barre, espace) ; code entre {{ et }} -> affiché en police Consolas
+			VAR _t = SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( Exemples[Retenir], "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" )
+			RETURN
+			    "<div style='font-family:Calibri,sans-serif;font-size:21px;line-height:1.45;color:#D4D4D4;'><ul style='margin:0;padding-left:22px;'><li style='font-size:21px;line-height:1.45;margin:0 0 14px 0;padding-left:4px;color:#D4D4D4;'>"
+			        & SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _t, " | ", "</li><li style='font-size:21px;line-height:1.45;margin:0 0 14px 0;padding-left:4px;color:#D4D4D4;'>" ), "{{", "<code style='font-family:Consolas,monospace;font-size:17px;background:#1E1E1E;color:#9CDCFE;padding:1px 6px;border-radius:4px;'>" ), "}}", "</code>" )
+			        & "</li></ul></div>"
+		dataType: string
+		isHidden
+		lineageTag: 81878221-3dc6-dd9c-a8f5-9914df07196c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Exemples = m
+		mode: import
+		queryGroup: Exemples
+		source =
+				// ============================================================
+				// TABLE : Exemples — contenu des 12 fiches pratiques
+				// À SAISIR ICI, en texte simple :
+				//   Mesures : noms exacts des mesures de la fiche, séparés par « | »
+				//   Retenir : puces séparées par « | » ; code entre {{ et }}
+				// Formules et mises en forme : colonnes calculées DAX (CodeDAX, CodeHTML,
+				// CodeHTMLApercu, RetenirHTML), lues dans les vraies mesures du modèle.
+				// Après modification d'une mesure : clic droit sur la table Exemples > Actualiser les données.
+				// ============================================================
+				let
+				    Source = #table(
+				        type table [Ordre = Int64.Type, Fonction = text, Titre = text, Categorie = text, Niveau = text, Accroche = text,
+				                    URLDoc = text, Mesures = text, Retenir = text],
+				        {
+				            {1, "CALCULATE", "CALCULATE()", "Filtre", "Essentiel", "Évalue une expression dans un contexte de filtre modifié.", "https://learn.microsoft.com/fr-fr/dax/calculate-function-dax", "Ventes|Ventes Smartphones|Part Smartphones %", "C'est LA fonction centrale du DAX : elle modifie le contexte de filtre, puis évalue l'expression. | Un filtre sur une colonne ({{Produits[Categorie] = ""Smartphones""}}) remplace le filtre existant sur cette même colonne. | Les autres filtres restent actifs : chaque ligne du tableau garde sa marque, on obtient donc les smartphones de la marque. | Les marques sans smartphone (accessoires, audio) affichent un vide : aucune ligne ne passe le filtre."},
+				            {2, "SUMX", "SUM() vs SUMX()", "Agrégation", "Essentiel", "SUM additionne une colonne ; SUMX calcule ligne à ligne, puis additionne.", "https://learn.microsoft.com/fr-fr/dax/sumx-function-dax", "Ventes|Ventes au prix catalogue", "{{SUM ( Commandes[Montant] )}} est un raccourci de {{SUMX ( Commandes, Commandes[Montant] )}}. | SUMX est un itérateur : il parcourt la table ligne par ligne et évalue l'expression sur chacune. | Quantité × prix se calcule ligne par ligne : {{SUM ( Quantite ) * SUM ( PrixUnitaire )}} donnerait un résultat faux, car le prix change d'un produit à l'autre. | {{RELATED}} lit la valeur dans la table liée côté « un » : ici le prix catalogue dans Produits."},
+				            {3, "COUNTROWS", "COUNTROWS()", "Agrégation", "Essentiel", "Compte le nombre de lignes d'une table, filtrée ou non.", "https://learn.microsoft.com/fr-fr/dax/countrows-function-dax", "Nb lignes de vente|Nb ventes > 1000", "{{COUNTROWS ( Table )}} compte les lignes visibles dans le contexte de filtre courant. | Pour compter selon une condition, filtrez une colonne dans CALCULATE : {{CALCULATE ( COUNTROWS ( Commandes ), Commandes[Montant] > 1000 )}}. | À éviter : {{COUNTROWS ( FILTER ( Commandes, … ) )}}. Même résultat, mais FILTER parcourt toute la table : souvent plus lent (« filtrez des colonnes, pas des tables »). | Pour compter des lignes, préférez COUNTROWS à COUNT(colonne) : plus lisible et indépendant des valeurs vides."},
+				            {4, "RANKX", "RANKX()", "Statistiques", "Avancé", "Classe chaque élément d'une table selon la valeur d'une expression.", "https://learn.microsoft.com/fr-fr/dax/rankx-function-dax", "Rang produit", "1er argument : la liste à classer. {{ALL ( Produits[Produit] )}} classe sur tous les produits, quel que soit le filtre. | 2e argument : l'expression évaluée pour chaque élément, ici la mesure {{[Ventes]}}. | DESC : le plus grand est n° 1. DENSE : pas de trou après un ex æquo (1, 2, 2, 3). | Sans le IF, la ligne Total afficherait le rang 1 : {{HASONEVALUE ( Produits[Produit] )}} ne calcule le rang que pour un produit unique."},
+				            {5, "SWITCH", "SWITCH() : couleur conditionnelle", "Logiques", "Courant", "Retourne le résultat de la première condition vraie.", "https://learn.microsoft.com/fr-fr/dax/switch-function-dax", "Couleur évolution", "{{SWITCH ( TRUE (), … )}} teste les conditions dans l'ordre et s'arrête à la première vraie : plus lisible qu'une cascade de IF. | Le dernier argument, sans condition, est la valeur par défaut. | La mesure renvoie un code couleur : Mise en forme conditionnelle › Couleur de police › Valeur du champ. | Testez le vide en premier : en DAX, un vide est comparé comme 0. Sans N-1, l'évolution vide passerait le test {{>= 0}} et s'afficherait en bleu."},
+				            {6, "COALESCE", "COALESCE() : gérer les vides", "Logiques", "Courant", "Retourne le premier argument qui n'est pas vide.", "https://learn.microsoft.com/fr-fr/dax/coalesce-function-dax", "Ventes (0 si vide)", "{{COALESCE ( a, b, … )}} renvoie la première valeur non vide : idéal pour afficher 0 au lieu d'un vide. | Kalisto ne vend pas tous les mois : {{[Ventes]}} est vide, {{[Ventes (0 si vide)]}} affiche 0. | Attention : une mesure qui ne renvoie jamais de vide fait réapparaître toutes les lignes du visuel. | Gardez le même type : {{COALESCE ( [Ventes], ""-"" )}} mélange nombre et texte et casse le format."},
+				            {7, "FORMAT", "FORMAT()", "Texte", "Courant", "Convertit une valeur en texte selon un format.", "https://learn.microsoft.com/fr-fr/dax/format-function-dax", "Message ventes", "FORMAT renvoie du texte : le résultat ne se trie plus et ne s'additionne plus comme un nombre. | Les formats suivent la langue du modèle (fr-FR) : « dddd d mmmm yyyy » donne « lundi 4 août 2025 ». | « #,##0 € » ajoute le séparateur de milliers et le symbole €. | Sur la ligne Total, il n'y a pas une date unique : HASONEVALUE bascule sur un message « Total de la période »."},
+				            {8, "USERELATIONSHIP", "USERELATIONSHIP()", "Relation", "Courant", "Active une relation inactive le temps d'un calcul.", "https://learn.microsoft.com/fr-fr/dax/userelationship-function-dax", "Ventes|Ventes date expédition", "Deux relations relient Commandes à Calendrier : DateCommande (active) et DateExpedition (inactive, en pointillés). | USERELATIONSHIP s'utilise dans CALCULATE et active la relation choisie pour ce seul calcul. | Les commandes de fin de mois expédiées le mois suivant changent de mois : les deux colonnes diffèrent. | Pas besoin de dupliquer la table Calendrier pour analyser selon une autre date."},
+				            {9, "REMOVEFILTERS", "REMOVEFILTERS()", "Filtre", "Courant", "Supprime les filtres d'une table ou d'une colonne.", "https://learn.microsoft.com/fr-fr/dax/removefilters-function-dax", "Ventes toutes marques|Part de la marque %", "{{REMOVEFILTERS ( Produits[Marque] )}} ignore le filtre posé par la ligne du tableau sur la marque. | Les autres filtres (année, segment…) restent actifs. | Usage classique : le dénominateur d'une part du total, avec DIVIDE. | C'est l'équivalent, plus lisible, de {{ALL()}} utilisé comme filtre dans CALCULATE."},
+				            {10, "DATEADD", "DATEADD()", "Time Intelligence", "Courant", "Décale les dates du contexte d'un nombre d'intervalles.", "https://learn.microsoft.com/fr-fr/dax/dateadd-function-dax", "Ventes N-1|Évolution vs N-1 %", "{{DATEADD ( Calendrier[Date], -1, YEAR )}} décale la période filtrée d'un an en arrière. | Il faut une table de dates continue, en années complètes. La marquer comme table de dates est obligatoire si la relation passe par une clé non date (ex. 20250101) ; ici, c'est fait par sécurité. | DIVIDE évite l'erreur de division par zéro et renvoie un vide si N-1 est vide. | Fonctionne aussi avec QUARTER, MONTH ou DAY."},
+				            {11, "TOTALYTD", "TOTALYTD()", "Time Intelligence", "Courant", "Calcule le cumul depuis le début de l'année.", "https://learn.microsoft.com/fr-fr/dax/totalytd-function-dax", "Ventes cumul annuel", "{{TOTALYTD ( expression, colonne date )}} cumule du 1er janvier jusqu'à la fin de la période affichée. | Le cumul repart de zéro chaque année. | Exercice décalé : ajoutez la date de fin d'exercice, par exemple {{TOTALYTD ( [Ventes], Calendrier[Date], ""06-30"" )}}. Dans la syntaxe officielle, c'est le 4e argument, après un filtre facultatif. | Équivalent : {{CALCULATE ( [Ventes], DATESYTD ( Calendrier[Date] ) )}}."},
+				            {12, "PREVIOUSMONTH", "PREVIOUSMONTH()", "Time Intelligence", "Courant", "Renvoie tous les jours du mois précédent.", "https://learn.microsoft.com/fr-fr/dax/previousmonth-function-dax", "Ventes mois précédent", "PREVIOUSMONTH renvoie le mois entier qui précède la première date du contexte. | Utilisée comme filtre dans CALCULATE, elle donne les ventes du mois précédent. | Ligne Total : on obtient décembre 2024, le mois qui précède le 1er janvier 2025. C'est normal. | Pour un décalage libre (2 mois, 1 trimestre…), préférez {{DATEADD ( …, -1, MONTH )}}."}
+				        }
+				    )
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

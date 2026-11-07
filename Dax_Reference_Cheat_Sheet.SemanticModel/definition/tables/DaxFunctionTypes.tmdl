@@ -1,0 +1,85 @@
+table DaxFunctionTypes
+	lineageTag: c5142c0f-031d-4143-aafa-e0bce1f6c07a
+
+	column OrdreCategorie
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 02aa68cb-5438-4f8b-91e7-46c1727e3ae0
+		summarizeBy: none
+		sourceColumn: OrdreCategorie
+
+		annotation SummarizationSetBy = Automatic
+
+	column DaxFunctionTypes
+		dataType: string
+		lineageTag: b48d690f-1090-478a-a8fd-1cffc6619bf2
+		summarizeBy: none
+		sourceColumn: DaxFunctionTypes
+
+		annotation SummarizationSetBy = Automatic
+
+	column DaxFunctionTypesLink
+		dataType: string
+		isHidden
+		lineageTag: 5845d750-4410-4121-a809-d28df21e95f3
+		summarizeBy: none
+		sourceColumn: DaxFunctionTypesLink
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Libellé court de la catégorie (segments)
+	column DaxFunctionTypesShort
+		dataType: string
+		lineageTag: afb3c923-818f-450e-a015-7b48f97ad5f6
+		summarizeBy: none
+		sourceColumn: DaxFunctionTypesShort
+		sortByColumn: OrdreCategorie
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DaxFunctionTypes-cbb6bbe8-227e-4bd8-8d83-148c741859ba = m
+		mode: import
+		queryGroup: Tables
+		source =
+				// ============================================================
+				// TABLE : DaxFunctionTypes
+				// RÔLE  : Liste fixe des 15 catégories de fonctions DAX
+				//         Source : learn.microsoft.com/fr-fr/dax/dax-function-reference
+				// NOTE  : Hardcodée car la page index est générée en JS
+				//         (non lisible par Web.BrowserContents)
+				//         DaxFunctionTypesShort = libellé court pour les segments
+				// ============================================================
+				let
+				    #"Liste catégories" = #table(
+				        type table [
+				            OrdreCategorie       = Int64.Type,
+				            DaxFunctionTypes     = text,
+				            DaxFunctionTypesLink = text,
+				            DaxFunctionTypesShort = text
+				        ],
+				        {
+				            { 1, "fonctions d'agrégation",                      "aggregation-functions-dax",        "Agrégation"},
+				            { 2, "fonctions de date et d'heure",                "date-and-time-functions-dax",      "Date et heure"},
+				            { 3, "fonctions de filtre",                         "filter-functions-dax",             "Filtre"},
+				            { 4, "fonctions financières",                       "financial-functions-dax",          "Financières"},
+				            { 5, "fonctions INFO",                              "info-functions-dax",               "INFO"},
+				            { 6, "fonctions d'informations",                    "information-functions-dax",        "Informations"},
+				            { 7, "fonctions logiques",                          "logical-functions-dax",            "Logiques"},
+				            { 8, "fonctions mathématiques et trigonométriques", "math-and-trig-functions-dax",      "Maths et trigo"},
+				            { 9, "autres fonctions",                            "other-functions-dax",              "Autres"},
+				            {10, "fonctions parent et enfant",                  "parent-and-child-functions-dax",   "Parent et enfant"},
+				            {11, "fonctions de relation",                       "relationship-functions-dax",       "Relation"},
+				            {12, "fonctions statistiques",                      "statistical-functions-dax",        "Statistiques"},
+				            {13, "fonctions de manipulation de table",          "table-manipulation-functions-dax", "Manipulation de table"},
+				            {14, "fonctions de texte",                          "text-functions-dax",               "Texte"},
+				            {15, "fonctions Time Intelligence",                 "time-intelligence-functions-dax",  "Time Intelligence"}
+				        }
+				    )
+				in
+				    #"Liste catégories"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

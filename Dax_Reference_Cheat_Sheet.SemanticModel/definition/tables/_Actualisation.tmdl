@@ -1,0 +1,31 @@
+/// Libellé de la date d'actualisation (recalculé à chaque actualisation)
+table _Actualisation
+	isHidden
+	lineageTag: 0ed6b232-5926-4c68-80c3-985c313b1369
+
+	column LibelleActualisation
+		dataType: string
+		isHidden
+		lineageTag: bb489570-3247-4613-ae6e-0e43a767abdf
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [LibelleActualisation]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Actualisation = calculated
+		mode: import
+		source =
+				-- Date d'actualisation à l'heure de Paris. NOW() renvoie l'heure UTC dans le Service :
+				-- une actualisation entre minuit et 2 h afficherait la veille.
+				VAR _utc = UTCNOW ()
+				VAR _an = YEAR ( _utc )
+				VAR _finMars = DATE ( _an, 3, 31 )
+				VAR _finOctobre = DATE ( _an, 10, 31 )
+				-- Heure d'été : du dernier dimanche de mars au dernier dimanche d'octobre, à 1 h UTC
+				VAR _debutEte = _finMars - MOD ( WEEKDAY ( _finMars, 2 ), 7 ) + TIME ( 1, 0, 0 )
+				VAR _finEte = _finOctobre - MOD ( WEEKDAY ( _finOctobre, 2 ), 7 ) + TIME ( 1, 0, 0 )
+				VAR _decalage = IF ( _utc >= _debutEte && _utc < _finEte, 2, 1 )
+				RETURN
+				    ROW ( "LibelleActualisation", FORMAT ( _utc + _decalage / 24, "dd/mm/yyyy" ) )
+

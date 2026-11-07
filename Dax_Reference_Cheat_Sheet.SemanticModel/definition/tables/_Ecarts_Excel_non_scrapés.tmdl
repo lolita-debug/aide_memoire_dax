@@ -1,0 +1,41 @@
+/// Contrôle : fonctions de l'Excel absentes du scraping Microsoft
+table _Ecarts_Excel_non_scrapés
+	lineageTag: 5f060bda-6c3c-41bc-93a3-bd38640667e9
+
+	column Fonction
+		dataType: string
+		lineageTag: d3ea5f4d-3bc8-47b9-bcd1-82e2db7d83ed
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Fonction]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nature
+		dataType: string
+		lineageTag: f2a2c7b1-a1d5-4b71-a08d-f1c95c114d7a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Nature]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Description
+		dataType: string
+		lineageTag: 880cf3de-82ce-4f47-868e-f9a3056ea117
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Description]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Ecarts_Excel_non_scrapés = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+				    FILTER ( DATA_DAX, NOT DATA_DAX[Fonction DAX] IN VALUES ( DaxFunctions[NomFonctionDAX] ) ),
+				    "Fonction", DATA_DAX[Fonction DAX],
+				    "Nature", DATA_DAX[Nature de la fonction],
+				    "Description", DATA_DAX[Description]
+				)
+

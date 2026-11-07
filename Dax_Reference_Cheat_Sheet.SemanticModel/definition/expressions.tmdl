@@ -1,0 +1,222 @@
+/// URL de base de la référence DAX (Microsoft Learn, fr-fr)
+/// Historique : msdn.microsoft.com/en-us/query-bi/dax/ -> learn.microsoft.com/en-us/dax/ (02/2023) -> fr-fr
+expression ParamWebPath = "https://learn.microsoft.com/fr-fr/dax/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: fa93ac75-c846-43ae-853d-9c3bc324b986
+	queryGroup: Paramètres
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+/// Chemin complet du classeur Excel COMMANDES_DAX (table DATA_DAX). À adapter sur chaque poste.
+expression ParamCheminExcel = "C:\MonChemin\COMMANDES_DAX.xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=false]
+	lineageTag: 3c73775a-fbab-4aab-b44f-958420ff0b26
+	queryGroup: Paramètres
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+/// true = lit aussi la page de chaque fonction (lent : ~1 page web par fonction).
+/// false = actualisation rapide, sans les détails (syntaxe, retour, remarques, exemples).
+expression ParamScraperDetails = true meta [IsParameterQuery=true, Type="Logical", IsParameterQueryRequired=true]
+	lineageTag: 96015ce0-6707-5846-89b2-29d349019f74
+	queryGroup: Paramètres
+
+	annotation PBI_ResultType = Logical
+
+	annotation PBI_NavigationStepName = Navigation
+
+/// Scrape une page catégorie DAX : nom, slug et description courte des fonctions
+expression GetDaxFunctions =
+		// ============================================================
+		// FONCTION : GetDaxFunctions
+		// RÔLE     : Scrape une page catégorie DAX (fr-fr) et retourne
+		//            la liste des fonctions avec nom, lien et description
+		// PARAMÈTRES :
+		//   - CheminWebBase : URL de base   ex : "https://learn.microsoft.com/fr-fr/dax/"
+		//   - NomTypeSlug   : slug catégorie ex : "date-and-time-functions-dax"
+		// ============================================================
+		let
+		    Source = (CheminWebBase as text, NomTypeSlug as text) => let
+		
+		        // -- Étape 1 : Télécharger le HTML de la page catégorie
+		        #"Téléchargement page catégorie" = Web.BrowserContents(CheminWebBase & NomTypeSlug),
+		
+		        // -- Étape 2 : Extraire le tableau HTML
+		        //   colonne 1 = lien vers la fonction / colonne 2 = description courte
+		        #"Extraction tableau HTML" = Html.Table(
+		            #"Téléchargement page catégorie",
+		            {
+		                {"NomFonctionDAX",    "table td:first-child a"},
+		                {"LienFonctionDAX",   "table td:first-child a", each [Attributes][href]},
+		                {"DescriptionCourte", "table td:nth-child(2)"}
+		            },
+		            [RowSelector = "table tr:has(td)"]
+		        ),
+		
+		        // -- Étape 3 : Typer les colonnes en texte
+		        #"Typage colonnes" = Table.TransformColumnTypes(
+		            #"Extraction tableau HTML",
+		            {{"NomFonctionDAX", type text}, {"LienFonctionDAX", type text}, {"DescriptionCourte", type text}}
+		        ),
+		
+		        // -- Étape 4 : Ne garder que le slug du lien
+		        //   "/fr-fr/dax/calendar-function-dax" -> "calendar-function-dax"
+		        #"Extraction slug lien" = Table.TransformColumns(
+		            #"Typage colonnes",
+		            {{"LienFonctionDAX", each if _ <> null then List.Last(Text.Split(_, "/")) else null, type text}}
+		        ),
+		
+		        // -- Étape 5 : Normaliser le nom (clé de relation) : sans espaces parasites, en majuscules
+		        #"Normalisation nom" = Table.TransformColumns(
+		            #"Extraction slug lien",
+		            {{"NomFonctionDAX", each if _ <> null then Text.Upper(Text.Trim(Text.Clean(_))) else null, type text}}
+		        ),
+		
+		        // -- Étape 6 : Supprimer les lignes sans nom de fonction
+		        #"Suppression lignes vides" = Table.SelectRows(
+		            #"Normalisation nom",
+		            each [NomFonctionDAX] <> null and [NomFonctionDAX] <> ""
+		        )
+		    in
+		        #"Suppression lignes vides"
+		in
+		    Source
+	lineageTag: 5bf3f0d3-bbc0-4688-b002-d45b53b53b77
+	queryGroup: Fonctions
+
+	annotation PBI_ResultType = Function
+
+	annotation PBI_NavigationStepName = Navigation
+
+/// Scrape la page d'une fonction DAX : description, syntaxe, retour, remarques, exemples
+expression GetDaxFunctionDetails =
+		// ============================================================
+		// FONCTION : GetDaxFunctionDetails
+		// RÔLE     : Scrape la page d'une fonction DAX et retourne 1 ligne :
+		//            Description, Syntaxe, Valeur de retour, Remarques, Exemples,
+		//            MethodeExtraction (contrôle de qualité)
+		// MÉTHODE PRINCIPALE : repérage par les titres de section (h2) de la page
+		//            « Syntaxe », « Valeur de retour », « Remarques », « Exemple(s) ».
+		// MÉTHODE DE SECOURS : position des paragraphes après « S'applique à »
+		//            (méthode d'origine), utilisée champ par champ si la principale
+		//            ne trouve rien. La colonne MethodeExtraction dit laquelle a servi.
+		// ============================================================
+		let
+		    Source = (CheminWebBase as text, SlugFonction as text) => let
+		
+		        // -- Étape 1 : Télécharger le HTML de la page de la fonction
+		        #"Téléchargement page fonction" = Web.BrowserContents(CheminWebBase & SlugFonction),
+		
+		        // ===== A. MÉTHODE PRINCIPALE : titres de section =====
+		
+		        // -- Étape A1 : Flux des éléments dans l'ordre de la page (titres, paragraphes, puces, blocs de code)
+		        #"Flux éléments" = try Html.Table(
+		            #"Téléchargement page fonction",
+		            {{"H2", "h2"}, {"PRE", "pre"}, {"LI", "li"}, {"P", "p"}},
+		            [RowSelector = "h2, p, li, pre"]
+		        ) otherwise #table({"H2", "PRE", "LI", "P"}, {}),
+		
+		        // -- Étape A2 : Type et texte de chaque élément
+		        #"Éléments typés" = List.Transform(
+		            Table.ToRecords(#"Flux éléments"),
+		            each [
+		                Type  = if [H2] <> null then "h2" else if [PRE] <> null then "pre" else if [LI] <> null then "li" else "p",
+		                Texte = Text.Trim([H2] ?? [PRE] ?? [LI] ?? [P] ?? "")
+		            ]
+		        ),
+		
+		        // -- Étape A3 : Rattacher chaque élément au dernier titre h2 rencontré
+		        #"Éléments par section" = List.Accumulate(
+		            #"Éléments typés",
+		            [Titre = "", Liste = {}],
+		            (etat, el) =>
+		                if el[Type] = "h2" then [Titre = Text.Lower(el[Texte]), Liste = etat[Liste]]
+		                else if el[Texte] = "" then etat
+		                else [Titre = etat[Titre], Liste = etat[Liste] & {[Section = etat[Titre], Type = el[Type], Texte = el[Texte]]}]
+		        )[Liste],
+		
+		        // -- Étape A4 : Textes d'une section (mot-clé dans le titre) pour certains types d'éléments
+		        //   Un paragraphe déjà contenu dans une puce de la même section n'est pas repris deux fois
+		        TextesSection = (motCle as text, types as list) as list =>
+		            let
+		                Elements = List.Select(#"Éléments par section", each Text.Contains([Section], motCle) and List.Contains(types, [Type])),
+		                Puces = List.Transform(List.Select(Elements, each [Type] = "li"), each [Texte]),
+		                SansDoublons = List.Select(Elements, (el) => el[Type] <> "p" or not List.AnyTrue(List.Transform(Puces, (pu) => Text.Contains(pu, el[Texte]))))
+		            in
+		                List.Transform(SansDoublons, each [Texte]),
+		
+		        #"Syntaxe (titres)"      = List.First(TextesSection("syntaxe", {"pre"}), null),
+		        #"Retour (titres)"       = List.First(TextesSection("valeur", {"p", "li"}), null),
+		        #"Remarques (titres)"    = let l = List.FirstN(TextesSection("remarque", {"p", "li"}), 3) in if List.IsEmpty(l) then null else Text.Combine(l, " | "),
+		        #"Exemples (titres)"     = let l = List.FirstN(TextesSection("exemple", {"pre"}), 3) in if List.IsEmpty(l) then null else Text.Combine(l, " | "),
+		
+		        // ===== B. MÉTHODE DE SECOURS : position des paragraphes (méthode d'origine) =====
+		
+		        // -- Étape B1 : Tous les paragraphes non vides, avec leur index
+		        #"Tous les paragraphes" = Html.Table(#"Téléchargement page fonction", {{"Texte", "p"}}, [RowSelector = "p"]),
+		        #"Paragraphes non vides" = Table.SelectRows(#"Tous les paragraphes", each [Texte] <> null and Text.Trim([Texte]) <> ""),
+		        #"Avec index" = Table.AddIndexColumn(#"Paragraphes non vides", "Index", 0, 1),
+		
+		        // -- Étape B2 : Index du paragraphe "s’applique à" (’ ou ', majuscule ou non)
+		        #"Ligne applique" = Table.SelectRows(
+		            #"Avec index",
+		            each Text.StartsWith(Text.Lower(Text.Replace(Text.Trim([Texte]), "’", "'")), "s'applique")
+		        ),
+		        #"Index applique" = try #"Ligne applique"{0}[Index] otherwise null,
+		
+		        // -- Étape B3 : Paragraphes qui suivent, sans les encadrés (Remarque, Important...)
+		        //   Un encadré = 1 paragraphe titre + 1 paragraphe texte : on saute les deux
+		        #"Paragraphes suivants" = if #"Index applique" = null then {} else List.Skip(#"Avec index"[Texte], #"Index applique" + 1),
+		        #"Titres encadrés" = {"remarque", "important", "conseil", "attention", "avertissement", "prudence", "note"},
+		        #"Paragraphes utiles" = List.Accumulate(
+		            #"Paragraphes suivants",
+		            [Liste = {}, Sauter = false],
+		            (etat, p) =>
+		                if etat[Sauter] then [Liste = etat[Liste], Sauter = false]
+		                else if List.Contains(#"Titres encadrés", Text.Lower(Text.Trim(p))) then [Liste = etat[Liste], Sauter = true]
+		                else [Liste = etat[Liste] & {p}, Sauter = false]
+		        )[Liste],
+		
+		        // -- Étape B4 : Description = 1er paragraphe utile (sert aussi à la méthode principale :
+		        //   la description est avant le 1er titre, sans titre propre), Valeur de retour = 2e
+		        #"Description"  = #"Paragraphes utiles"{0}?,
+		        #"Retour (position)" = #"Paragraphes utiles"{1}?,
+		
+		        // -- Étape B5 : Remarques = 3 paragraphes suivants, hors début d'exemples
+		        #"RemarquesFiltrees" = List.Select(
+		            List.FirstN(List.Skip(#"Paragraphes utiles", 2), 3),
+		            each not Text.StartsWith(_, "La formule") and not Text.StartsWith(_, "Pour un")
+		        ),
+		        #"Remarques (position)" = if List.IsEmpty(#"RemarquesFiltrees") then null else Text.Combine(#"RemarquesFiltrees", " | "),
+		
+		        // -- Étape B6 : Syntaxe = 1er bloc <pre><code>, Exemples = les 3 suivants
+		        #"Blocs code" = Html.Table(#"Téléchargement page fonction", {{"Valeur", "pre code"}}, [RowSelector = "pre code"])[Valeur],
+		        #"Syntaxe (position)" = #"Blocs code"{0}?,
+		        #"ExemplesFiltres" = List.RemoveNulls(List.FirstN(List.Skip(#"Blocs code", 1), 3)),
+		        #"Exemples (position)" = if List.IsEmpty(#"ExemplesFiltres") then null else Text.Combine(#"ExemplesFiltres", " | "),
+		
+		        // ===== C. Assemblage : titres d'abord, position en secours =====
+		        #"Méthode" = if #"Syntaxe (titres)" <> null and #"Retour (titres)" <> null then "Titres de section"
+		                     else if #"Syntaxe (titres)" <> null or #"Retour (titres)" <> null then "Mixte"
+		                     else "Position (secours)",
+		        #"Table résultat" = Table.FromRecords({[
+		            DescriptionFonction = #"Description",
+		            SyntaxeFonction     = #"Syntaxe (titres)"   ?? #"Syntaxe (position)",
+		            ValeurRetour        = #"Retour (titres)"    ?? #"Retour (position)",
+		            Remarques           = #"Remarques (titres)" ?? #"Remarques (position)",
+		            Exemples            = #"Exemples (titres)"  ?? #"Exemples (position)",
+		            MethodeExtraction   = #"Méthode"
+		        ]})
+		    in
+		        #"Table résultat"
+		in
+		    Source
+	lineageTag: 26932c3b-17c5-47d0-a8d2-50b03b523017
+	queryGroup: Fonctions
+
+	annotation PBI_ResultType = Function
+
+	annotation PBI_NavigationStepName = Navigation
+

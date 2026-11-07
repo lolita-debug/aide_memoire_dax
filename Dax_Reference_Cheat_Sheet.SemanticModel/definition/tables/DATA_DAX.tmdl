@@ -1,0 +1,147 @@
+table DATA_DAX
+	lineageTag: 9380672f-60fc-4f7a-97cc-d6d3d2f1522b
+
+	column Source
+		dataType: string
+		lineageTag: 712beada-f2c9-4cc1-a68f-3ead18133ef0
+		summarizeBy: none
+		sourceColumn: Source
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Nature de la fonction'
+		dataType: string
+		lineageTag: dfb16801-c66a-43ff-9ce5-db9a30d63208
+		summarizeBy: none
+		sourceColumn: Nature de la fonction
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Utilisation - Objet en sortie'
+		dataType: string
+		lineageTag: 66d867f4-07d8-407a-95fa-e234cff850ac
+		summarizeBy: none
+		sourceColumn: Utilisation - Objet en sortie
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fonction DAX'
+		dataType: string
+		lineageTag: 2c525b7f-8647-48de-8cb0-8bd07cd3d577
+		summarizeBy: none
+		sourceColumn: Fonction DAX
+
+		annotation SummarizationSetBy = Automatic
+
+	column Type
+		dataType: string
+		lineageTag: d70557fd-2e62-440d-9bc5-d22da7b56578
+		summarizeBy: none
+		sourceColumn: Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cal_Column
+		dataType: string
+		lineageTag: e7e454ab-d81a-469a-9a06-a72606ab8572
+		summarizeBy: none
+		sourceColumn: Cal_Column
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cal_Table
+		dataType: string
+		lineageTag: 5757cbdf-4ca5-43f4-b457-3b119805d38f
+		summarizeBy: none
+		sourceColumn: Cal_Table
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mesure
+		dataType: string
+		lineageTag: aa2a0f79-41bf-456d-af5c-0054c908d11e
+		summarizeBy: none
+		sourceColumn: Mesure
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cal_Visuel
+		dataType: string
+		lineageTag: b581fc6a-8b45-4c1b-9ce0-ab95d14230da
+		summarizeBy: none
+		sourceColumn: Cal_Visuel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Description
+		dataType: string
+		lineageTag: 00b0241b-21dc-4233-9061-b4296811710d
+		summarizeBy: none
+		sourceColumn: Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column Exemple
+		dataType: string
+		lineageTag: 83e0a0e1-a879-45f3-8152-936533f93858
+		summarizeBy: none
+		sourceColumn: Exemple
+
+		annotation SummarizationSetBy = Automatic
+
+	column Remarque
+		dataType: string
+		lineageTag: 33bca8a7-7837-4db7-aa28-a90f1324cce6
+		summarizeBy: none
+		sourceColumn: Remarque
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fonction
+		dataType: string
+		lineageTag: 0c7013d5-555a-4041-9a0c-a27f54522111
+		summarizeBy: none
+		sourceColumn: Fonction
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DATA_DAX = m
+		mode: import
+		queryGroup: Tables
+		source =
+				// ============================================================
+				// TABLE : DATA_DAX
+				// RÔLE  : Fiches DAX maison (classeur Excel COMMANDES_DAX)
+				//         Chemin du fichier : paramètre ParamCheminExcel
+				// ============================================================
+				let
+				    // FACULTATIF : sans classeur (chemin absent ou invalide), la table est vide et le rapport fonctionne
+				    Vide = #table(type table [Source = text, #"Nature de la fonction" = text, #"Utilisation - Objet en sortie" = text, #"Fonction DAX" = text,
+				        Type = text, Cal_Column = text, Cal_Table = text, Mesure = text, Cal_Visuel = text, Description = text, Exemple = text,
+				        Remarque = text, Fonction = text], {}),
+				    DATA_DAX_Table = try Excel.Workbook(File.Contents(ParamCheminExcel), null, true){[Item="DATA_DAX",Kind="Table"]}[Data] otherwise Vide,
+				    #"Type modifié" = Table.TransformColumnTypes(DATA_DAX_Table, {{"Source", type text}, {"Nature de la fonction", type text}, {"Utilisation - Objet en sortie", type text}, {"Fonction DAX", type text}, {"Type", type text}, {"Cal_Column", type text}, {"Cal_Table", type text}, {"Mesure", type text}, {"Cal_Visuel", type text}, {"Description", type text}, {"Exemple", type text}, {"Remarque", type text}, {"Fonction", type text}}),
+				
+				    // -- Même normalisation que DaxFunctions[NomFonctionDAX] pour que la relation matche
+				    #"Normalisation nom" = Table.TransformColumns(
+				        #"Type modifié",
+				        {{"Fonction DAX", each if _ <> null then Text.Upper(Text.Trim(Text.Clean(_))) else null, type text}}
+				    ),
+				
+				    // -- Matrice d'usage : symbole → mot AVANT chargement. Le moteur du modèle compare le texte sans tenir
+				    //    compte de la casse et confond ✔/❗/❌ : il ne garderait qu'un seul de ces symboles par colonne.
+				    //    Power Query, lui, compare caractère par caractère (codes Unicode 10004 / 10071 / 10060).
+				    SymboleEnMot = (s) => if s = null or Text.Trim(s) = "" then null else
+				        let c = Character.ToNumber(Text.Start(Text.Trim(s), 1)) in
+				        if c = 10004 then "OUI" else if c = 10071 then "PRECAUTION" else if c = 10060 then "NON" else null,
+				    #"Matrice en mots" = Table.TransformColumns(
+				        #"Normalisation nom",
+				        {{"Cal_Column", SymboleEnMot, type text}, {"Cal_Table", SymboleEnMot, type text}, {"Mesure", SymboleEnMot, type text}, {"Cal_Visuel", SymboleEnMot, type text}}
+				    )
+				in
+				    #"Matrice en mots"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,47 @@
+model Model
+	culture: fr-FR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: fr-FR
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup Paramètres
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup Fonctions
+
+	annotation PBI_QueryGroupOrder = 1
+
+queryGroup Tables
+
+	annotation PBI_QueryGroupOrder = 2
+
+queryGroup Exemples
+
+	annotation PBI_QueryGroupOrder = 3
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["ParamWebPath","ParamCheminExcel","ParamScraperDetails","GetDaxFunctions","GetDaxFunctionDetails","DaxFunctionTypes","DaxFunctions","DATA_DAX","TopFonctionsDAX","_TableMesures","Produits","Calendrier","Commandes","Exemples"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table DaxFunctionTypes
+ref table DaxFunctions
+ref table DATA_DAX
+ref table TopFonctionsDAX
+ref table _TableMesures
+ref table _Actualisation
+ref table _Ecarts_DaxFunctions_vs_Excel
+ref table _Ecarts_Excel_non_scrapés
+ref table _Fiches_Code
+ref table Produits
+ref table Calendrier
+ref table Commandes
+ref table Exemples
+
+ref cultureInfo fr-FR
+
