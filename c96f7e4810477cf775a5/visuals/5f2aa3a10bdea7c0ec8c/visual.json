@@ -1,0 +1,79 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "5f2aa3a10bdea7c0ec8c",
+  "position": {
+    "x": 290,
+    "y": 378,
+    "z": 2350,
+    "height": 56,
+    "width": 560,
+    "tabOrder": 2350
+  },
+  "visual": {
+    "visualType": "textSlicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DaxFunctions"
+                    }
+                  },
+                  "Property": "NomFonctionDAX"
+                }
+              },
+              "queryRef": "DaxFunctions.NomFonctionDAX",
+              "nativeQueryRef": "NomFonctionDAX",
+              "displayName": "Nom de la fonction"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "general": [
+        {
+          "properties": {}
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "syncGroup": {
+      "groupName": "Guide_Nom",
+      "fieldChanges": true,
+      "filterChanges": true
+    }
+  }
+}
